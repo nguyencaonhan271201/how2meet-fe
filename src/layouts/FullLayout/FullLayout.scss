@@ -1,0 +1,16 @@
+.full-layout {
+  height: 100vh;
+
+  &__header {
+   display: flex;
+  }
+  &__center {
+    display: flex;
+  }
+  &__container {
+    display: flex;
+  }
+  &__footer {
+    display: flex;
+  }
+}
