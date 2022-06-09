@@ -7,6 +7,9 @@ import { PublicRouter } from './PublicRouter';
 
 //Containers
 import { LoginPage } from '../containers/LoginPage/LoginPage';
+import { RegisterPage } from '../containers/RegisterPage/RegisterPage';
+import { LandingPage } from '../containers/LandingPage/LandingPage';
+import { MeetingDashboard } from '../containers/MeetingDashboard/MeetingDashboard';
 
 //Layouts
 import { OnlyFooterLayout } from '../layouts/OnlyFooterLayout/OnlyFooterLayout';
@@ -18,13 +21,27 @@ export const Routers = () => {
   return (
     <Router>
       <Switch>
-        <PublicRouter exact={true} path={'/'} component={LoginPage} layout={FullLayout} />
+        <PublicRouter exact={true} path={'/'} component={LandingPage} layout={FullLayout} />
 
         <PublicRouter
           exact={true}
-          path={'/abc'}
+          path={'/auth'}
           component={LoginPage}
           layout={OnlyFooterLayout}
+        />
+
+        <PublicRouter
+          exact={true}
+          path={'/auth/register'}
+          component={RegisterPage}
+          layout={OnlyFooterLayout}
+        />
+
+        <PrivateRouter
+          exact={true}
+          path={'/meetings'}
+          component={MeetingDashboard}
+          layout={FullLayout}
         />
 
       </Switch>
