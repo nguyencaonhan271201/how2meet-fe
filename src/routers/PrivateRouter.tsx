@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Redirect, Route } from 'react-router-dom';
+import { Redirect, Route, useHistory } from 'react-router-dom';
+import { auth, onAuthStateChanged } from '../configs/firebase';
 
 export const PrivateRouter: React.FC<IPrivateRouter> = ({
   component: Component,
@@ -11,11 +12,16 @@ export const PrivateRouter: React.FC<IPrivateRouter> = ({
   const Footer = Component.Footer ?? <></>;
   const Sidebar = Component.Sidebar ?? <></>;
 
-  //CHECK IF NOT LOGGED IN
-  const isLoggedIn = false;
-  if (!isLoggedIn) {
-    return <Redirect to="/" />;
-  }
+  const history = useHistory();
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user: any) => {
+      //NAVIGATE IF NOT LOGGED IN
+      if (!user) {
+        history.push("/auth");
+      }
+    });
+  }, []);
 
   return (
     <Route

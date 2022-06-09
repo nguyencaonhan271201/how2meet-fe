@@ -11,3 +11,69 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+:root {
+  --theme-green: #bccc9a;
+  --theme-red: #c37b89;
+  --theme-blue: #d1e8e4;
+  --theme-light-gray: #F2F2F2;
+  --theme-dark-gray: #999999;
+  --theme-yellow: #EACC70;
+  --theme-blur-green: rgba(188, 204, 154, .41);
+  --theme-orange: #E7785D;
+  --theme-green-hover: #98ac6e;
+  --theme-dark-border: #818181;
+  --theme-light-border: #cccccc;
+  --theme-input-border: rgb(229, 229, 229);
+  --theme-text-light-grey: rgb(127, 127, 127);
+  --theme-dark-green: #8da459;
+}
+
+html,body {
+  margin:0;
+  padding:0;
+  overflow-x:hidden;
+}
+
+.container-fluid {
+  width: 100vw;
+  min-height: 100vh;
+}
+
+@font-face {
+  font-family: "medium";
+  src: local('medium'),
+  url("assets/fonts/9Slide03-Smoothy-Sans.ttf")
+  format('truetype');
+}
+
+@font-face {
+  font-family: "regular";
+  src: local('regular'),
+  url("assets/fonts/9Slide03-Open-Sans-Light.ttf")
+  format('truetype');
+}
+
+html {
+  overflow: scroll;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+::-webkit-sadcrollbar {
+  width: 0px;
+  background: transparent;
+  display: none;
+}
+
+body * {
+  transition: all 0.3s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "medium" !important;
+}
+
+a, p, td, th, ul, li, button, input {
+  font-family: "regular" !important;
+}
