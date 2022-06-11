@@ -15,12 +15,10 @@ export const PrivateRouter: React.FC<IPrivateRouter> = ({
   const history = useHistory();
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user: any) => {
-      //NAVIGATE IF NOT LOGGED IN
-      if (!user) {
-        history.push("/auth");
-      }
-    });
+    let getItem = localStorage.getItem("firebaseLoggedIn");
+    if (getItem === "0") {
+      history.push("/auth", { isRedirect: true })
+    }
   }, []);
 
   return (

@@ -28,12 +28,7 @@ export const RegisterPage: React.FC<ILoginPage> = ({ }) => {
   const [confirmPasswordError, setConfirmPasswordError] = useState<string>("");
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user: any) => {
-      //SIGN OUT IF LOGGED IN
-      if (user) {
-        logout();
-      }
-    });
+    logout();
   }, []);
 
   const validateAndRegister = async () => {

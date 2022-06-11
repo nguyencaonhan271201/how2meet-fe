@@ -5,7 +5,7 @@ import LogoHow2Meet from '../../assets/images/logo.svg';
 
 import React, { useEffect, useState } from 'react';
 import { signInWithGoogle, logInWithEmailAndPassword, registerWithEmailAndPassword, logout, onAuthStateChanged, auth } from '../../configs/firebase';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { validateEmail } from '../../helpers/validate';
@@ -17,6 +17,7 @@ export const LoginPage: React.FC<ILoginPage> = ({ }) => {
   document.title = "How2Meet? | Login"
 
   const history = useHistory();
+  const location = useLocation() as any;
   const MySwal = withReactContent(Swal);
 
   const [email, setEmail] = useState<string>("");
@@ -26,12 +27,15 @@ export const LoginPage: React.FC<ILoginPage> = ({ }) => {
   const [passwordError, setPasswordError] = useState<string>("");
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user: any) => {
-      //SIGN OUT IF LOGGED IN
-      if (user) {
-        logout();
-      }
-    });
+    logout();
+
+    if (location?.state?.isRedirect) {
+      MySwal.fire({
+        icon: 'error',
+        title: 'Error...',
+        text: 'Please log in to continue!',
+      })
+    }
   }, []);
 
   const validateLogin = async () => {
@@ -81,6 +85,7 @@ export const LoginPage: React.FC<ILoginPage> = ({ }) => {
         }
 
         //Valid login
+        localStorage.setItem("firebaseLoggedIn", "1");
         history.push("/meetings");
       })
       .catch((error: any) => {
