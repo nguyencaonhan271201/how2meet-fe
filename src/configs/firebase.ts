@@ -88,6 +88,7 @@ const sendPasswordReset = async (email: string) => {
 
 const logout = () => {
   signOut(auth);
+  localStorage.setItem("firebaseLoggedIn", "0");
 };
 
 export {
