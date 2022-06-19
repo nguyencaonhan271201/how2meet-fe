@@ -7,11 +7,11 @@ export const PrivateRouter: React.FC<IPrivateRouter> = ({
   layout: Layout,
   exact,
   path,
+  header: Header,
+  footer: Footer,
+  isHasHeader,
+  isHasFooter,
 }) => {
-  const Header = Component.Header ?? <></>;
-  const Footer = Component.Footer ?? <></>;
-  const Sidebar = Component.Sidebar ?? <></>;
-
   const history = useHistory();
 
   useEffect(() => {
@@ -27,7 +27,10 @@ export const PrivateRouter: React.FC<IPrivateRouter> = ({
       path={path}
       render={(props: any) => {
         return (
-          <Layout header={Header} footer={Footer}>
+          <Layout
+            header={isHasHeader ? <Header /> : <></>}
+            footer={isHasFooter ? <Footer /> : <></>}
+          >
             <Component {...props} />
           </Layout>
         );
