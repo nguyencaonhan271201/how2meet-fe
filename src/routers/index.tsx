@@ -15,6 +15,7 @@ import { MeetingDashboard } from '../containers/MeetingDashboard/MeetingDashboar
 import { OnlyFooterLayout } from '../layouts/OnlyFooterLayout/OnlyFooterLayout';
 import { FullLayout } from '../layouts/FullLayout/FullLayout';
 import { Footer } from '../components/Footer/Footer';
+import { CreateMeeting } from '../containers/CreateMeeting/CreateMeeting';
 
 export const Routers = () => {
   // const buildysURL = process.env.REACT_APP_LINK_BUILDYS;
@@ -42,6 +43,15 @@ export const Routers = () => {
           exact={true}
           path={'/meetings'}
           component={MeetingDashboard}
+          layout={OnlyFooterLayout}
+          footer={Footer}
+          isHasFooter={true}
+        />
+
+        <PrivateRouter
+          exact={true}
+          path={'/new-meeting'}
+          component={CreateMeeting}
           layout={OnlyFooterLayout}
           footer={Footer}
           isHasFooter={true}
