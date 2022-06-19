@@ -27,6 +27,7 @@ code {
   --theme-input-border: rgb(229, 229, 229);
   --theme-text-light-grey: rgb(127, 127, 127);
   --theme-dark-green: #8da459;
+  --theme-blue: #446784;
 }
 
 html,body {
@@ -51,6 +52,13 @@ html,body {
   font-family: "regular";
   src: local('regular'),
   url("assets/fonts/9Slide03-Open-Sans-Light.ttf")
+  format('truetype');
+}
+
+@font-face {
+  font-family: "Quicksans";
+  src: local('regular'),
+  url("assets/fonts/9SLIDE03-QUICKSAND-MEDIUM.ttf")
   format('truetype');
 }
 

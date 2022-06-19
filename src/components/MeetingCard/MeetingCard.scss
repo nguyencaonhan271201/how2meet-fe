@@ -1,0 +1,138 @@
+.meeting-card { 
+  padding: 10px 15px;
+  width: 450px;
+  height: 100%;
+  border-radius: 30px;
+  position: relative;
+  cursor: pointer;
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr;
+  margin-right: 5px;
+
+  * {
+    font-family: "Quicksans" !important;
+  }
+
+  &:not(:first-child) {
+    margin-right: 5px;
+  }
+
+  &__participants {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  &__participant {
+    border-radius: 50%;
+    width: 35px;
+    object-fit: cover;
+    height: 35px;
+
+    &:not(:first-child) {
+      margin-left: -5px;
+    }
+  }
+
+  &__type {
+    font-size: 0.8rem;
+    color: var(--theme-blue);
+    margin-bottom: 3px;
+    text-align: right;
+    position: absolute;
+    right: 10px;
+    top: 0px;
+  } 
+  
+  &__title {
+    font-size: 2.5rem;
+    color: var(--theme-blue);
+    margin-bottom: 10px;
+  }
+
+  &__info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    &--detail {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+
+      p {
+        margin: 0;
+        margin-left: 5px;
+      }
+
+      svg {
+        height: 25px;
+      }
+
+      &__text {
+        display: inline-block;
+        font-size: 25px;
+
+        &--current {
+          font-size: 15px;
+        }
+      }
+    }
+  }
+
+
+  &--green {
+    border: 2px solid var(--theme-green);
+
+    .meeting-card {
+      &__type {
+        color: var(--theme-green);
+      } 
+      
+      &__title {
+        color: var(--theme-green);
+      }
+
+      &__info {
+        &--detail {
+          svg {
+            path {
+              fill: var(--theme-green);
+            }
+          }
+
+          &__text {
+            color: var(--theme-green);
+          }
+        }
+      }
+    }
+  }
+
+  &--blue {
+    border: 2px solid var(--theme-blue);
+
+    .meeting-card {
+      &__type {
+        color: var(--theme-blue);
+      } 
+      
+      &__title {
+        color: var(--theme-blue);
+      }
+
+      &__info {
+        &--detail {
+          svg {
+            path {
+              fill: var(--theme-blue);
+            }
+          }
+
+          &__text {
+            color: var(--theme-blue);
+          }
+        }
+      }
+    }
+  }
+}
