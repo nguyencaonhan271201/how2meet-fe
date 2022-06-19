@@ -9,3 +9,7 @@ interface ILandingPage {
 interface IMeetingDashboard {
   
 }
+
+interface ICreateMeeting {
+  
+}
