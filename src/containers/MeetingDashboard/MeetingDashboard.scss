@@ -1,0 +1,61 @@
+.meetings {
+  padding: 40px;
+  padding-bottom: 20px;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  height: 100%;
+  width: 100%;
+
+  &__title {
+    font-size: 3rem;
+  }
+
+  &__list {
+    width: fit-content;
+    display: flex;
+    height: 95%;
+
+    &--container {
+      height: 75%;
+      overflow: scroll;
+      width: calc(100vw - 80px);
+      position: relative;
+    }
+  }
+
+  &__archived {
+    opacity: .8;
+    max-height: 100%;
+  }
+
+  &__current {
+    max-height: 100%;
+  }
+
+  &__white-space {
+    height: 10px;
+  }
+
+  &__add-btn {
+    background: black;
+    padding: 5px 30px;
+    position: absolute;
+    right: 40px;
+    border-radius: 8rem;
+    cursor: pointer;
+
+    &:hover {
+      opacity: .8;
+    }
+
+    svg {
+      path {
+        fill: white
+      }
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    grid-template-rows: 1fr 1fr;
+  }
+}
