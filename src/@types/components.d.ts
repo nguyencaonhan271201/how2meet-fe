@@ -20,3 +20,18 @@ interface IInput {
   label?: string;
   error?: string;
 }
+
+interface IParcipant {
+  name?: string;
+  profileImage?: string;
+}
+
+interface IMeetingCard {
+  meetingID?: number;
+  isCurrent?: boolean;
+  type?: number;
+  title?: string;
+  time?: string;
+  location?: string;
+  participants?: Array<IParcipant>;
+}

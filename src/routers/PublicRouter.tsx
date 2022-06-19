@@ -19,10 +19,8 @@ export const PublicRouter: React.FC<IPublicRouter> = ({
       render={(props: any) => {
         return (
           <Layout
-            header={
-              <></>
-            }
-            footer={<></>}
+            header={isHasHeader ? <Header /> : <></>}
+            footer={isHasFooter ? <Footer /> : <></>}
           >
             <Component {...props} />
           </Layout>

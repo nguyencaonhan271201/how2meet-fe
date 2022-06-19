@@ -1,9 +1,13 @@
 .only-footer {
+  min-height: 100vh;
+  position: relative;
+  
   &__footer {
    display: flex;
   }
   &__center {
     display: flex;
+    height: calc(100vh - 60px);
   }
   &__container {
     display: flex;
