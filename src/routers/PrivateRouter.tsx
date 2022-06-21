@@ -1,21 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Redirect, Route } from 'react-router-dom';
+import { Redirect, Route, useHistory } from 'react-router-dom';
+import { auth, onAuthStateChanged } from '../configs/firebase';
 
 export const PrivateRouter: React.FC<IPrivateRouter> = ({
   component: Component,
   layout: Layout,
   exact,
   path,
+  header: Header,
+  footer: Footer,
+  isHasHeader,
+  isHasFooter,
 }) => {
-  const Header = Component.Header ?? <></>;
-  const Footer = Component.Footer ?? <></>;
-  const Sidebar = Component.Sidebar ?? <></>;
+  const history = useHistory();
 
-  //CHECK IF NOT LOGGED IN
-  const isLoggedIn = false;
-  if (!isLoggedIn) {
-    return <Redirect to="/" />;
-  }
+  useEffect(() => {
+    let getItem = localStorage.getItem("firebaseLoggedIn");
+    if (getItem === "0") {
+      history.push("/auth", { isRedirect: true })
+    }
+  }, []);
 
   return (
     <Route
@@ -23,7 +27,10 @@ export const PrivateRouter: React.FC<IPrivateRouter> = ({
       path={path}
       render={(props: any) => {
         return (
-          <Layout header={Header} footer={Footer}>
+          <Layout
+            header={isHasHeader ? <Header /> : <></>}
+            footer={isHasFooter ? <Footer /> : <></>}
+          >
             <Component {...props} />
           </Layout>
         );

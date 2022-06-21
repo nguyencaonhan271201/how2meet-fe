@@ -1,0 +1,52 @@
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 60px;
+  padding: 10px;
+
+  &__profile-img {
+    border-radius: 50%;
+    object-fit: cover;
+    height: 40px;
+    width: 40px;
+  }
+
+  &__menu {
+    width: fit-content;
+    position: absolute;
+    bottom: 10px;
+    left: 55px;
+    background: #999999;
+    border-radius: 27px;
+    overflow: hidden;
+    display: none;
+    transition: display 300ms;
+
+    &--show {
+      display: flex !important;
+    }
+
+    ul {
+      margin-bottom: 0;
+      list-style: none;
+      padding: 0;
+
+      li {
+        text-decoration: none;
+        text-align: center;
+        padding: 5px;
+        color: white;
+        cursor: pointer;
+
+        &:hover {
+          background: #616161;
+        }
+      }
+
+      li:not(:last-child) {
+        border-bottom: 2px solid white; 
+      }
+    }
+  }
+}

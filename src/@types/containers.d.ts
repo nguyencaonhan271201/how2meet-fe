@@ -1,3 +1,19 @@
 interface ILoginPage {
-  param1?: string;
+  
+}
+
+interface ILandingPage {
+
+}
+
+interface IMeetingDashboard {
+  
+}
+
+interface ICreateMeeting {
+  
+}
+
+interface IMeetingMinute {
+  
 }
