@@ -12,6 +12,7 @@ import {
   onAuthStateChanged 
 }
 from "firebase/auth";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCxvv8uFc2r2kmPD5DWFb-EHlWNujPH26Q",
@@ -91,6 +92,8 @@ const logout = () => {
   localStorage.setItem("firebaseLoggedIn", "0");
 };
 
+const storage = getStorage(app);
+
 export {
   auth,
   signInWithGoogle,
@@ -99,5 +102,6 @@ export {
   sendPasswordReset,
   logout,
   sendVerificationEmail,
-  onAuthStateChanged 
+  onAuthStateChanged,
+  storage
 };
