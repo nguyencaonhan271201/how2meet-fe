@@ -11,6 +11,7 @@ export const MeetingMinute: React.FC<IMeetingMinute> = ({ }) => {
 
   const performSave = () => {
     //TODO: Call API to save to database
+    //BE integrated later
   }
 
   return (
