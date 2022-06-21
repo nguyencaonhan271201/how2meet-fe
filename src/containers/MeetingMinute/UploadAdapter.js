@@ -20,8 +20,6 @@ export class UploadAdapter {
           uploadTask.on(
             'state_changed',
             function (snapshot) {
-              var progress =
-                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
               switch (snapshot.state) {
                 case "paused":
                   break;
