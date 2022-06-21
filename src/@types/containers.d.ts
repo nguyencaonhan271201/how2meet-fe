@@ -13,3 +13,7 @@ interface IMeetingDashboard {
 interface ICreateMeeting {
   
 }
+
+interface IMeetingMinute {
+  
+}
