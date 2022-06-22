@@ -8,8 +8,11 @@ import { useHistory } from 'react-router-dom';
 
 export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
   document.title = "How2Meet? | Meetings";
+
+  //const [futureList, setFutureList] = useState<Array<any>>([]);
   //const [currentList, setCurrentList] = useState<Array<any>>([]);
   //const [archivedList, setArchivedList] = useState<Array<any>>([]);
+
   const history = useHistory();
 
   let currentList = [
@@ -170,6 +173,7 @@ export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
         }}>
         <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
       </div>
+
       <div className="meetings__current">
         <h1 className="meetings__title">CURRENT</h1>
 
