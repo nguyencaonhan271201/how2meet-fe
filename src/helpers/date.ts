@@ -33,3 +33,15 @@ export const isBetween = (fromDate: Date, toDate: Date, d: Date) => {
 
   return fromClone <= cloneDay && cloneDay <= toClone;
 }
+
+export const getTimeText = (index: number) => {
+  let minutes = ["00", "30"];
+  let hours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
+
+  return `${hours[Math.floor(index / 2)]}:${minutes[index % 2]} - 
+  ${index % 2 === 0 ? hours[Math.floor(index / 2)] : hours[Math.floor(index / 2)] + 1}:${index % 2 === 0? "30" : "00"}`
+}
+
+export const getWeekNumber = (date: Date) => {
+  return moment(date).week();
+}
