@@ -22,6 +22,7 @@
     overflow: hidden;
     display: none;
     transition: display 300ms;
+    min-width: 105px;
 
     &--show {
       display: flex !important;
