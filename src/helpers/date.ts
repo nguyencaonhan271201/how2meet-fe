@@ -22,7 +22,7 @@ export const getMonday = (d: Date) => {
 
 export const getSunday = (d: Date) => {
   var day = d.getDay(),
-    diff = d.getDate() - day + 7;
+    diff = d.getDate() - day + (day == 0? 0 : 7);
   return new Date(d.setDate(diff));
 }
 

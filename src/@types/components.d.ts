@@ -21,7 +21,8 @@ interface IInput {
   error?: string;
 }
 
-interface IParcipant {
+interface IParticipant {
+  id?: string;
   name?: string;
   profileImage?: string;
 }
@@ -33,5 +34,18 @@ interface IMeetingCard {
   title?: string;
   time?: string;
   location?: string;
-  participants?: Array<IParcipant>;
+  participants?: Array<IParticipant>;
+}
+
+interface IPollingChoiceCard {
+  meetingID?: number;
+  choiceID?: number;
+  type?: number;
+  title?: string;
+  link?: string;
+  location?: string;
+  description?: string;
+  isAddCard?: boolean;
+  selectors?: Array<IParticipant>;
+  addAction?: () => void;
 }
