@@ -8,11 +8,12 @@ import { getMonday, getMonthNameFromIndex, getNumberOfDaysInMonthAndYear, getSun
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import ReactTooltip from 'react-tooltip';
+import { PollingChoiceCard } from '../../components/PollingChoiceCard/PollingChoiceCard';
 
 export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
   document.title = "How2Meet? | New Meeting";
 
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(3);
   const MySwal = withReactContent(Swal);
 
   //Page 0
@@ -33,6 +34,12 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
   const startPosition = useRef<number>(-1);
   const [showingSelectors, setShowingSelectors] = useState<Array<any>>([]);
   const mouseEnterNew = useRef<boolean>(false);
+
+  //Page 3
+  const [pollOptions, setPollOptions] = useState<Array<any>>([]);
+  const [letUserAdd, setLetUserAdd] = useState<boolean>(false);
+  const [choiceLimit, setChoiceLimit] = useState<number>(1);
+  const [isLimitChoices, setIsLimitChoices] = useState<boolean>(false);
 
   //Hooks
   useEffect(() => {
@@ -252,6 +259,93 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
         }
       }
     }
+  }
+
+  const addAction = () => {
+    MySwal.fire({
+      title: 'Add an option',
+      html: `
+          <div>
+            <label for="title" class="mr-2 mt-2 swal-label">title</label>
+            <input class="swal2-input" placeholder="title" type="text" id="title"><br>
+          </div>
+
+          <div>
+            <label for="location" class="mr-2 mt-2 swal-label">location</label>
+            <input class="swal2-input" placeholder="location" type="text" id="location"><br>
+          </div>
+
+          <div>
+            <label for="link" class="mr-2 mt-2 swal-label">link</label>
+            <input class="swal2-input" placeholder="link" type="text" id="link"><br>
+          </div>
+
+          <div>
+            <label for="description" class="mr-2 mt-2 swal-label">description</label>
+            <textarea class="swal2-input" placeholder="description" id="description"></textarea>
+          </div>
+
+          <div>
+            <label for="type" class="mr-2 mt-2 swal-label">type</label>
+            <select class="swal2-input" id="type">
+              <option value="0" selected>Dining</option>
+              <option value="1">Activities</option>
+            </select>
+          </div>
+        `,
+      showCancelButton: true,
+      confirmButtonText: 'Add',
+      confirmButtonColor: 'green',
+      cancelButtonColor: 'red',
+      showLoaderOnConfirm: true,
+      didOpen: () => {
+
+      },
+      preConfirm: () => {
+        let title = (document?.getElementById('title') as HTMLInputElement).value || "";
+        let location = (document?.getElementById('location') as HTMLInputElement).value || "";
+        let link = (document?.getElementById('link') as HTMLInputElement).value || "";
+        let description = (document?.getElementById('title') as HTMLTextAreaElement).value || "";
+        let type = (document?.getElementById('type') as HTMLSelectElement).value || "0";
+
+        let errorText = "";
+        if (title === "") {
+          if (errorText !== "")
+            errorText += '<br>'
+          errorText += `please input the title.`
+        }
+
+        if (location === "") {
+          if (errorText !== "")
+            errorText += '<br>'
+          errorText += `please input the location.`
+        }
+
+        if (description === "") {
+          if (errorText !== "")
+            errorText += '<br>'
+          errorText += `please input the description.`
+        }
+
+        if (errorText === "") {
+          let thisOption = {
+            title: title,
+            location: location,
+            link: link,
+            description: description,
+            type: parseInt(type)
+          }
+
+          let clonePollOptions = [...pollOptions, thisOption];
+          setPollOptions(clonePollOptions);
+        } else {
+          MySwal.showValidationMessage(
+            errorText
+          )
+        }
+      },
+      allowOutsideClick: () => !MySwal.isLoading()
+    })
   }
 
   return (
@@ -479,16 +573,71 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
         </div>}
       </div>}
 
-      {currentPage === 3 && <div className="create-meeting__action-polling"></div>}
+      {currentPage === 3 && <div className="create-meeting__action-polling">
+        <h1 className="create-meeting__title">{meetingTitle !== "" ? meetingTitle : "Meeting"}
+        </h1>
+
+        <div className="create-meeting__action-polling__options">
+          {pollOptions.map((poll: any) => {
+            return <div className="create-meeting__action-polling__options--single">
+              <PollingChoiceCard
+                title={poll.title}
+                location={poll.location}
+                link={poll.link}
+                description={poll.description}
+                type={poll.type}
+              ></PollingChoiceCard>
+            </div>
+          })}
+          <div className="create-meeting__action-polling__options--single">
+            <PollingChoiceCard
+              isAddCard={true}
+              addAction={addAction}
+            ></PollingChoiceCard>
+          </div>
+        </div>
+
+        <div className="create-meeting__action-polling__settings">
+          <div className="create-meeting__action-polling__settings--option">
+            <input type="checkbox"
+              checked={letUserAdd}
+              onChange={(e: any) => { setLetUserAdd(e.checked) }} />
+            <p>let they add</p>
+          </div>
+          <div className="create-meeting__action-polling__settings--option">
+            <input type="checkbox"
+              checked={isLimitChoices}
+              onChange={(e: any) => { setIsLimitChoices(e.checked) }} />
+            <span>
+              <p style={{ display: "inline-flex", marginRight: 5 }}>limit to</p>
+              <input
+                type="number"
+                style={{ display: "inline", width: "50px" }}
+                value={choiceLimit}
+                min={1}
+                onChange={(e) => {
+                  if (!isNaN(parseInt(e.target.value))) {
+                    if (parseInt(e.target.value) < 1) {
+                      setChoiceLimit(1)
+                    } else setChoiceLimit(parseInt(e.target.value))
+                  }
+                  else setChoiceLimit(1);
+                }}>
+              </input>
+              <p style={{ display: "inline-flex", marginLeft: 5 }}>choices</p>
+            </span>
+          </div>
+        </div>
+      </div>}
 
       {/* TODO: Add options for polling (move from page 1 of prototype to page 3 of this) */}
 
       <div className="create-meeting__controls">
-        {/* {currentPage > 0 && <button className="create-meeting__prev" onClick={() => {
+        {currentPage > 2 && <button className="create-meeting__prev" onClick={() => {
           setCurrentPage(currentPage - 1);
         }}>
           <FontAwesomeIcon icon={faArrowLeft}></FontAwesomeIcon>
-        </button>} */}
+        </button>}
 
         <button className="create-meeting__next" onClick={() => {
           nextPage();
