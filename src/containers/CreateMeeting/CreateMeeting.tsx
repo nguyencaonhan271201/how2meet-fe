@@ -1,6 +1,7 @@
 import './CreateMeeting.scss';
 import React, { useEffect, useState, useRef } from 'react';
-import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons'
+import { faArrowLeft, faArrowRight, faLink, faCheck } from '@fortawesome/free-solid-svg-icons'
+import { faCopy } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -9,12 +10,16 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import ReactTooltip from 'react-tooltip';
 import { PollingChoiceCard } from '../../components/PollingChoiceCard/PollingChoiceCard';
+import { SearchBar } from '../../components/SearchBar/SearchBar';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
   document.title = "How2Meet? | New Meeting";
 
-  const [currentPage, setCurrentPage] = useState<number>(3);
+  const [currentPage, setCurrentPage] = useState<number>(0);
   const MySwal = withReactContent(Swal);
+  const numberOfPages = 5;
 
   //Page 0
   const [meetingTitle, setMeetingTitle] = useState<string>("");
@@ -41,6 +46,11 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
   const [choiceLimit, setChoiceLimit] = useState<number>(1);
   const [isLimitChoices, setIsLimitChoices] = useState<boolean>(false);
 
+  //Page 4
+  const [isPublic, setIsPublic] = useState<boolean>(false);
+  const [selectedInvitators, setSelectedInvitators] = useState<Array<any>>([]);
+  const [meetingID, setMeetingID] = useState<string>("");
+
   //Hooks
   useEffect(() => {
     console.log(inputBlocks);
@@ -49,6 +59,11 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
   useEffect(() => {
     generateCalendar();
   }, [fromDate, toDate]);
+
+  useEffect(() => {
+    //Generate random ID token for the meeting
+    setMeetingID((Math.random() + 1).toString(36).substring(6));
+  }, []);
 
   //Functions
   const generateCalendar = () => {
@@ -348,6 +363,12 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
     })
   }
 
+  const createMeeting = () => {
+    //TODO: Wrap up information
+
+    //TODO2: Call API to create meeting
+  }
+
   return (
     <div className="create-meeting">
       {currentPage === 0 && <div className="create-meeting__general-info">
@@ -630,7 +651,49 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
         </div>
       </div>}
 
-      {/* TODO: Add options for polling (move from page 1 of prototype to page 3 of this) */}
+      {currentPage === 4 && <div className="create-meeting__confirmation">
+        <h1 className="create-meeting__title">{meetingTitle !== "" ? meetingTitle : "Meeting"}
+        </h1>
+
+        <span>
+          <label className="switch" style={{ marginRight: "5px" }}>
+            <input type="checkbox"></input>
+            <span className="slider round" onClick={() => setIsPublic(!isPublic)}></span>
+          </label>
+          {` `}
+          {isPublic ? <span
+            style={{ color: "var(--theme-green)", marginRight: "4px" }}
+          >public</span> : "private"}
+        </span>
+
+        {/* Private mode */}
+        {!isPublic && <SearchBar
+          setSelected={setSelectedInvitators}
+        ></SearchBar>}
+
+        {/* Public mode */}
+        {isPublic && <div className="create-meeting__confirmation--public">
+          <div className="create-meeting__public-link">
+            <FontAwesomeIcon icon={faLink}></FontAwesomeIcon>
+            <p className="create-meeting__public-link--link" style={{ margin: 0 }}
+              onClick={() => {
+                navigator.clipboard.writeText(`${window.location.origin}/meeting/${meetingID}`);
+                toast("Copied to clipboard", {
+                  position: "top-right",
+                  autoClose: 1000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                })
+              }}>
+              {window.location.origin}/meeting/{meetingID}
+            </p>
+            <FontAwesomeIcon icon={faCopy}></FontAwesomeIcon>
+          </div>
+        </div>}
+      </div>}
 
       <div className="create-meeting__controls">
         {currentPage > 2 && <button className="create-meeting__prev" onClick={() => {
@@ -639,12 +702,20 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
           <FontAwesomeIcon icon={faArrowLeft}></FontAwesomeIcon>
         </button>}
 
-        <button className="create-meeting__next" onClick={() => {
+        {(currentPage !== numberOfPages - 1) && <button className="create-meeting__next" onClick={() => {
           nextPage();
         }}>
           <FontAwesomeIcon icon={faArrowRight}></FontAwesomeIcon>
-        </button>
+        </button>}
+
+        {(currentPage === numberOfPages - 1) && <button className="create-meeting__next" onClick={() => {
+          createMeeting();
+        }}>
+          <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
+        </button>}
       </div>
+
+      <ToastContainer />
     </div >
   );
 };

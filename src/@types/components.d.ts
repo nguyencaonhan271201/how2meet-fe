@@ -49,3 +49,9 @@ interface IPollingChoiceCard {
   selectors?: Array<IParticipant>;
   addAction?: () => void;
 }
+
+interface ISearchBar {
+  value?: string,
+  selected?: Array<any>,
+  setSelected?: any
+}
