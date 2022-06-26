@@ -17,6 +17,7 @@ import { FullLayout } from '../layouts/FullLayout/FullLayout';
 import { Footer } from '../components/Footer/Footer';
 import { CreateMeeting } from '../containers/CreateMeeting/CreateMeeting';
 import { MeetingMinute } from '../containers/MeetingMinute/MeetingMinute';
+import { MeetingImageUpload } from '../containers/MeetingImageUpload/MeetingImageUpload';
 
 export const Routers = () => {
   // const buildysURL = process.env.REACT_APP_LINK_BUILDYS;
@@ -67,6 +68,14 @@ export const Routers = () => {
           isHasFooter={true}
         />
 
+        <PrivateRouter
+          exact={true}
+          path={'/meeting-image/:id'}
+          component={MeetingImageUpload}
+          layout={OnlyFooterLayout}
+          footer={Footer}
+          isHasFooter={true}
+        />
       </Switch>
     </Router>
   );

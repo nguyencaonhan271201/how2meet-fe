@@ -17,3 +17,7 @@ interface ICreateMeeting {
 interface IMeetingMinute {
   
 }
+
+interface IMeetingImageUpload {
+  
+}
