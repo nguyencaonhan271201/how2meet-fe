@@ -4,7 +4,7 @@ import LogoGoogle from '../../assets/images/google_logo.svg';
 import LogoHow2Meet from '../../assets/images/logo.svg';
 
 import React, { useEffect, useState } from 'react';
-import { signInWithGoogle, logInWithEmailAndPassword, registerWithEmailAndPassword, logout, onAuthStateChanged, auth } from '../../configs/firebase';
+import { signInWithGoogle, logInWithEmailAndPassword, registerWithEmailAndPassword, logout, onAuthStateChanged, auth, googleProvider } from '../../configs/firebase';
 import { useHistory } from 'react-router-dom';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,12 +12,16 @@ import { validateEmail } from '../../helpers/validate';
 
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import { createUserWithEmailAndPassword, sendEmailVerification, signInWithPopup } from 'firebase/auth';
+import { useAppDispatch } from '../../redux';
+import { doPostNewUser } from '../../redux/slice/apiSlice/loginSlice';
 
 export const RegisterPage: React.FC<ILoginPage> = ({ }) => {
   document.title = "How2Meet? | Register"
 
   const history = useHistory();
   const MySwal = withReactContent(Swal);
+  const dispatch = useAppDispatch();
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -86,19 +90,41 @@ export const RegisterPage: React.FC<ILoginPage> = ({ }) => {
       return;
     }
 
-    await registerWithEmailAndPassword(email, password)
-      .then(async (result: any) => {
-        MySwal.close();
+    await createUserWithEmailAndPassword(auth, email, password)
+      .then((user: any) => {
+        if (auth.currentUser) {
+          sendEmailVerification(auth.currentUser)
+            .then((result: any) => {
+              MySwal.close();
 
-        MySwal.fire({
-          icon: 'success',
-          title: 'Success...',
-          text: 'Your account is created! Please check your email to verify your account!',
-        })
-          .then(() => {
-            logout();
-            return;
-          })
+              dispatch(doPostNewUser({
+                firebase_id: user.user.uid,
+                email: email,
+                password: '',
+                image: 'https://firebasestorage.googleapis.com/v0/b/cs204finalproj.appspot.com/o/istockphoto-1223671392-612x612.jpg?alt=media&token=e9312c19-c34e-4a87-9a72-552532766cde',
+                name: ''
+              }))
+
+              localStorage.setItem('firebase_id', user.user.uid);
+
+              MySwal.fire({
+                icon: 'success',
+                title: 'Success...',
+                text: 'Your account is created! Please check your email to verify your account!',
+              })
+                .then(() => {
+                  logout();
+                  return;
+                })
+            })
+            .catch((err: any) => {
+              MySwal.fire({
+                icon: 'error',
+                title: 'Error...',
+                text: err.message,
+              })
+            });
+        }
       })
       .catch((error: any) => {
         MySwal.close();
@@ -142,6 +168,32 @@ export const RegisterPage: React.FC<ILoginPage> = ({ }) => {
           text: error.message,
         })
       });
+  }
+
+  const signInWithGoogle = async () => {
+    try {
+      const res = await signInWithPopup(auth, googleProvider);
+      const user = res.user as any;
+
+      dispatch(doPostNewUser({
+        firebase_id: user.uid,
+        email: user?.reloadUserInfo?.providerUserInfo?.[0].email,
+        password: '',
+        image: user?.reloadUserInfo?.providerUserInfo?.[0].photoUrl,
+        name: user?.reloadUserInfo?.providerUserInfo?.[0].displayName
+      }))
+
+      localStorage.setItem('firebase_id', user.uid);
+      localStorage.setItem("firebaseLoggedIn", "1");
+      history.push("/meetings");
+
+    } catch (err: any) {
+      MySwal.fire({
+        icon: 'error',
+        title: 'Error...',
+        text: err.message,
+      })
+    }
   }
 
   return (

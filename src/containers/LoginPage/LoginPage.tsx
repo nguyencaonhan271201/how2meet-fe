@@ -4,7 +4,7 @@ import LogoGoogle from '../../assets/images/google_logo.svg';
 import LogoHow2Meet from '../../assets/images/logo.svg';
 
 import React, { useEffect, useState } from 'react';
-import { signInWithGoogle, logInWithEmailAndPassword, registerWithEmailAndPassword, logout, onAuthStateChanged, auth } from '../../configs/firebase';
+import { signInWithGoogle, logInWithEmailAndPassword, registerWithEmailAndPassword, logout, onAuthStateChanged, auth, googleProvider } from '../../configs/firebase';
 import { useHistory, useLocation } from 'react-router-dom';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,6 +12,9 @@ import { validateEmail } from '../../helpers/validate';
 
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import { signInWithPopup } from 'firebase/auth';
+import { doPostNewUser } from '../../redux/slice/apiSlice/loginSlice';
+import { useAppDispatch } from '../../redux';
 
 export const LoginPage: React.FC<ILoginPage> = ({ }) => {
   document.title = "How2Meet? | Login"
@@ -19,6 +22,7 @@ export const LoginPage: React.FC<ILoginPage> = ({ }) => {
   const history = useHistory();
   const location = useLocation() as any;
   const MySwal = withReactContent(Swal);
+  const dispatch = useAppDispatch();
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -86,6 +90,7 @@ export const LoginPage: React.FC<ILoginPage> = ({ }) => {
 
         //Valid login
         localStorage.setItem("firebaseLoggedIn", "1");
+        localStorage.setItem('firebase_id', result.user?.uid);
         history.push("/meetings");
       })
       .catch((error: any) => {
@@ -126,6 +131,32 @@ export const LoginPage: React.FC<ILoginPage> = ({ }) => {
         })
         return;
       });
+  }
+
+  const signInWithGoogle = async () => {
+    try {
+      const res = await signInWithPopup(auth, googleProvider);
+      const user = res.user as any;
+
+      dispatch(doPostNewUser({
+        firebase_id: user.uid,
+        email: user?.reloadUserInfo?.providerUserInfo?.[0].email,
+        password: '',
+        image: user?.reloadUserInfo?.providerUserInfo?.[0].photoUrl,
+        name: user?.reloadUserInfo?.providerUserInfo?.[0].displayName
+      }))
+
+      localStorage.setItem("firebaseLoggedIn", "1");
+      localStorage.setItem('firebase_id', user.uid);
+      history.push('/meetings');
+
+    } catch (err: any) {
+      MySwal.fire({
+        icon: 'error',
+        title: 'Error...',
+        text: err.message,
+      })
+    }
   }
 
   return (

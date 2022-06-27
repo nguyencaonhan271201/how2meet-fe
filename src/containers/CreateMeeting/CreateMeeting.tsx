@@ -98,7 +98,7 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
         })
 
         //FOR TESTING ONLY
-        if (start.getDate() === 25 && start.getMonth() === 5) {
+        if (start.getDate() === 28 && start.getMonth() === 5) {
           for (let i = 20; i < 28; i++) {
             thisWeek[thisWeek.length - 1].timeSlots[i] = {
               status: 0,
@@ -587,6 +587,7 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
               return (
                 <div className="create-meeting__selectors--single">
                   <img src={selector.profileImage}></img>
+                  <p style={{ margin: 0 }}>{selector.name}</p>
                 </div>
               )
             })}

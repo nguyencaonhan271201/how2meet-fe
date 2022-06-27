@@ -156,11 +156,8 @@ export const MeetingImageUpload: React.FC<IMeetingImageUpload> = ({ }) => {
           cloneImagesList.splice(index, 1);
           setImagesList(cloneImagesList);
           setUpdate(update + 1);
-        } else {
         }
       });
-
-
   }
 
   return (

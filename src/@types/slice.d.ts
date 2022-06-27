@@ -5,3 +5,13 @@ interface IAPITestSlice {
 interface IAppTestSlice {
   param2?: boolean;
 }
+
+interface ILoginSlice {
+  isCreatingNewUser?: boolean;
+  createNewUserError?: any;
+  createNewUserSuccess?: boolean;
+
+  isGettingUserInfo?: boolean,
+  gettingUserInfoSuccess?: boolean,
+  user?: ICreateUserResponse;
+}

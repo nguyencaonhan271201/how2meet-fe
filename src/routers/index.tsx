@@ -20,8 +20,6 @@ import { MeetingMinute } from '../containers/MeetingMinute/MeetingMinute';
 import { MeetingImageUpload } from '../containers/MeetingImageUpload/MeetingImageUpload';
 
 export const Routers = () => {
-  // const buildysURL = process.env.REACT_APP_LINK_BUILDYS;
-
   return (
     <Router>
       <Switch>
