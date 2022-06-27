@@ -13,6 +13,7 @@ import {
 }
 from "firebase/auth";
 import { getStorage } from "firebase/storage";
+import { resolve } from "node:path/win32";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCxvv8uFc2r2kmPD5DWFb-EHlWNujPH26Q",
@@ -26,9 +27,10 @@ const firebaseConfig = {
 
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+
 const MySwal = withReactContent(Swal);
 
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);  
 const auth = getAuth(app);
 
 const googleProvider = new GoogleAuthProvider();
@@ -57,7 +59,6 @@ const registerWithEmailAndPassword = async (email: string, password: string) => 
     if (auth.currentUser) {
       sendEmailVerification(auth.currentUser)
       .then((result: any) => {
-        
       })
       .catch((err: any) => {
         MySwal.fire({
@@ -103,5 +104,6 @@ export {
   logout,
   sendVerificationEmail,
   onAuthStateChanged,
-  storage
+  storage,
+  googleProvider
 };

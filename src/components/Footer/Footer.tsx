@@ -4,16 +4,31 @@ import Logo from '../../assets/images/logo.png';
 import React, { useEffect, useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useResposive } from '../../helpers/useResponsive';
+import { logout } from '../../configs/firebase';
+import { RootState, useAppDispatch } from '../../redux';
+import { doGetUserByFirebaseID } from '../../redux/slice/apiSlice/loginSlice';
+import { useSelector } from 'react-redux';
 
 export const Footer: React.FC<IFooter> = ({ }) => {
   const [isShowingMenu, setIsShowingMenu] = useState<boolean>(false);
   const corrupted = useRef<boolean>(false);
   const history = useHistory();
   const { isFromMobile } = useResposive();
+  const dispatch = useAppDispatch();
+  const user = useSelector(
+    (state: RootState) => state.loginSlice.user,
+  );
+
+  useEffect(() => {
+    if (localStorage.getItem('firebase_id'))
+      dispatch(doGetUserByFirebaseID({
+        firebase_id: localStorage.getItem('firebase_id') || ''
+      }))
+  }, []);
 
   return (
     <div className="footer">
-      <img className="footer__profile-img" src={Logo}
+      <img className="footer__profile-img" src={user?.image || Logo}
         onMouseOver={() => {
           if (isFromMobile) {
             corrupted.current = true;
@@ -62,7 +77,7 @@ export const Footer: React.FC<IFooter> = ({ }) => {
         <ul>
           <li onClick={() => { history.push("/meetings") }}>Dashboard</li>
           <li onClick={() => { history.push("/new-meeting") }}>New meeting</li>
-          <li onClick={() => { history.push("/logout") }}>Log out</li>
+          <li onClick={() => { logout(); history.push("/auth"); }}>Log out</li>
         </ul>
       </div>
     </div >

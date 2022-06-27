@@ -8,3 +8,15 @@ interface IAPIGet {
   param2?: string;
   file?: any;
 }
+
+interface IAPIPostNewUser {
+  firebase_id?: string;
+  email?: string;
+  password?: string;
+  image?: string;
+  name?: string;
+}
+
+interface IAPIUserByFirebaseID {
+  firebase_id?: string;
+}

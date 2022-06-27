@@ -3,7 +3,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 const baseURL = process.env.REACT_APP_API_ENDPOINT;
 
 const axiosTest = axios.create({
-  baseURL: baseURL + 'api/',
+  baseURL: baseURL,
   headers: {
     'content-type': 'application/json',
   },
