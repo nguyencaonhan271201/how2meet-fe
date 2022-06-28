@@ -52,6 +52,8 @@ export const Footer: React.FC<IFooter> = ({ }) => {
         }}
       ></img>
 
+      <p style={{ marginBottom: 0, marginLeft: 10 }}>{user?.name || user?.email}</p>
+
       <div className={`footer__menu ${isShowingMenu ? "footer__menu--show" : ""}`}
         onMouseOver={() => {
           if (isFromMobile) {
@@ -77,6 +79,7 @@ export const Footer: React.FC<IFooter> = ({ }) => {
         <ul>
           <li onClick={() => { history.push("/meetings") }}>Dashboard</li>
           <li onClick={() => { history.push("/new-meeting") }}>New meeting</li>
+          <li onClick={() => { history.push("/edit-account") }}>Edit Account</li>
           <li onClick={() => { logout(); history.push("/auth"); }}>Log out</li>
         </ul>
       </div>

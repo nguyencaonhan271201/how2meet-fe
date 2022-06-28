@@ -14,4 +14,11 @@ interface ILoginSlice {
   isGettingUserInfo?: boolean,
   gettingUserInfoSuccess?: boolean,
   user?: ICreateUserResponse;
+
+  isUpdateProfile?: boolean;
+  updateProfileSuccess?: boolean;
+}
+
+interface IMeetingSlice {
+  
 }

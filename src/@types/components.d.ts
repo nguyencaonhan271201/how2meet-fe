@@ -19,6 +19,7 @@ interface IInput {
   required?: boolean;
   label?: string;
   error?: string;
+  readonly?: boolean;
 }
 
 interface IParticipant {
