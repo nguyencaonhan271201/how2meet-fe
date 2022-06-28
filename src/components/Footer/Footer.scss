@@ -4,6 +4,9 @@
   left: 0;
   height: 60px;
   padding: 10px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 
   &__profile-img {
     border-radius: 50%;

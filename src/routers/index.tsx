@@ -18,6 +18,7 @@ import { Footer } from '../components/Footer/Footer';
 import { CreateMeeting } from '../containers/CreateMeeting/CreateMeeting';
 import { MeetingMinute } from '../containers/MeetingMinute/MeetingMinute';
 import { MeetingImageUpload } from '../containers/MeetingImageUpload/MeetingImageUpload';
+import { EditAccount } from '../containers/EditAccount/EditAccount';
 
 export const Routers = () => {
   return (
@@ -37,6 +38,15 @@ export const Routers = () => {
           path={'/auth/register'}
           component={RegisterPage}
           layout={OnlyFooterLayout}
+        />
+
+        <PublicRouter
+          exact={true}
+          path={'/edit-account'}
+          component={EditAccount}
+          layout={OnlyFooterLayout}
+          footer={Footer}
+          isHasFooter={true}
         />
 
         <PrivateRouter

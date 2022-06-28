@@ -73,10 +73,8 @@ export const MeetingImageUpload: React.FC<IMeetingImageUpload> = ({ }) => {
 
   const handleInputChange = async (e: any) => {
     //Upload images to firebase
-    console.log(e.target.files);
     Array.from(e.target.files).forEach(async (file: any) => {
       let uploadPromise = upload(file).then((url: any) => {
-        console.log(url);
         setImagesList([...imagesList, url.default]);
       })
 

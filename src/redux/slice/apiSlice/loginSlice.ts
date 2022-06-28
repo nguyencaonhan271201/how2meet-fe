@@ -12,6 +12,11 @@ export const doGetUserByFirebaseID = createAsyncThunk('apiLogin@get/getUserByFir
   return result.data;
 });
 
+export const doUpdateProfile = createAsyncThunk('apiLogin@post/updateProfile', async (param: IAPIPostNewUser) => {
+  const result: AxiosResponse = await apiLogin.updateProfile(param);
+  return result.data;
+});
+
 const initialState = {
   isCreatingNewUser: false,
   createNewUserError: {},
@@ -20,6 +25,9 @@ const initialState = {
   isGettingUserInfo: false,
   gettingUserInfoSuccess: false,
   user: {},
+
+  isUpdateProfile: false,
+  updateProfileSuccess: false,
 } as ILoginSlice;
 
 const slice = createSlice({
@@ -56,7 +64,21 @@ const slice = createSlice({
     });
     builder.addCase(doGetUserByFirebaseID.rejected, (state, action) => {
       state.gettingUserInfoSuccess = false;
-      state.isGettingUserInfo = true;
+      state.isGettingUserInfo = false;
+    });
+
+    //doUpdateProfile
+    builder.addCase(doUpdateProfile.pending, (state) => {
+      state.isUpdateProfile = true;
+    });
+    builder.addCase(doUpdateProfile.fulfilled, (state, action) => {
+      state.updateProfileSuccess = true;
+      state.isUpdateProfile = false;
+      state.user = action.payload;
+    });
+    builder.addCase(doUpdateProfile.rejected, (state, action) => {
+      state.updateProfileSuccess = false;
+      state.isUpdateProfile = false;
     });
   },
 });

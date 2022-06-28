@@ -1,0 +1,58 @@
+.edit-account {
+  padding: 40px;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+
+  &__form {
+    width: 50%;
+    margin: 0 auto;
+  }
+
+  &__title {
+    text-align: center;
+  }
+
+  &__image {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    cursor: pointer;
+    text-align: center;
+
+    &--block {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    &--error {
+      color: red;
+    }
+  }
+
+  &__save {
+    background: black;
+    padding: 5px;
+    border-radius: 8rem;
+    outline: none;
+    border: none;
+    color: white;
+    width: 50%;
+
+    &:hover {
+      opacity: .8;
+    }
+
+    &-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+  }
+}

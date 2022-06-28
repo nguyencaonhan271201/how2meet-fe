@@ -21,3 +21,7 @@ interface IMeetingMinute {
 interface IMeetingImageUpload {
   
 }
+
+interface IEditAccount {
+  
+}
