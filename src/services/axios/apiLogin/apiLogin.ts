@@ -16,4 +16,9 @@ export const apiLogin = {
     const url = '/users/updateProfile';
     return axiosTest.post(url, user);
   },
+
+  searchUserByQuery: (param: IAPISearchUserByQuery) => {
+    const url = 'users/findUsersByQuery';
+    return axiosTest.get(url + "/" + param.query);
+  }
 };

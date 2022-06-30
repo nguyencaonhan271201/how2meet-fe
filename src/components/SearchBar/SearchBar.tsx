@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { faMagnifyingGlass, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { doGetUserByFirebaseID, doSearchUserByQuery, RootState, useAppDispatch } from '../../redux';
+import { useSelector } from 'react-redux';
 
 export const SearchBar: React.FC<ISearchBar> = ({
   value,
@@ -10,24 +12,23 @@ export const SearchBar: React.FC<ISearchBar> = ({
   setSelected
 }) => {
   const history = useHistory();
+  const dispatch = useAppDispatch();
 
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isFocus, setIsFocus] = useState<boolean>(false);
-  const [selectedList, setSelectedList] = useState<Array<IParticipant>>([]);
-  const [searchResults, setSearchResults] = useState<Array<IParticipant>>([]);
+  const [selectedList, setSelectedList] = useState<Array<ICreateUserResponse>>([]);
+  const [searchResults, setSearchResults] = useState<Array<ICreateUserResponse>>([]);
   const [update, setUpdate] = useState<number>(0);
 
+  const { searchResults: searchUserResults } = useSelector(
+    (state: RootState) => state.userSearchSlice,
+  );
+  const { user } = useSelector(
+    (state: RootState) => state.loginSlice,
+  );
+
   const searchUser = (name: string) => {
-    setSearchResults([
-      {
-        name: "Nhan Nguyen Cao",
-        profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F1.jpg?alt=media&token=54729427-14b6-4be6-a26b-1cca524d67ff"
-      },
-      {
-        name: "Nhan Nguyen Cao",
-        profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F2.jpg?alt=media&token=9c5c8f2b-a18b-467a-bf5a-9deaedd5056d"
-      }
-    ])
+    dispatch(doSearchUserByQuery({ query: name }));
   }
 
   const selectUser = (userToAdd: any) => {
@@ -49,13 +50,31 @@ export const SearchBar: React.FC<ISearchBar> = ({
     setSelected(selectedList);
   }, [selectedList]);
 
+  useEffect(() => {
+    if (localStorage.getItem('firebase_id'))
+      dispatch(doGetUserByFirebaseID({
+        firebase_id: localStorage.getItem('firebase_id') || ''
+      }))
+  }, []);
+
+  useEffect(() => {
+    if (searchUserResults && user) {
+      let filteredSearchResults = [] as any[];
+      searchUserResults.forEach((result: any) => {
+        if (result.firebase_id !== user.firebase_id)
+          filteredSearchResults.push(result);
+      })
+      setSearchResults(filteredSearchResults)
+    }
+  }, [searchUserResults]);
+
   return (
     <div className="search-bar">
       <div className="search-bar__selected">
         {selectedList.map((user: any, index: any) => {
           return (
             <div className="search-bar__selected-user">
-              <img src={user.profileImage}></img>
+              <img src={user.image}></img>
               <p>{user.name}</p>
               <FontAwesomeIcon className="search-bar__selected-user--icon" icon={faCircleXmark}
                 onClick={() => { removeUser(index) }}></FontAwesomeIcon>
@@ -88,7 +107,7 @@ export const SearchBar: React.FC<ISearchBar> = ({
             return (<div className="search-bar__search-result-user" onClick={() => {
               selectUser(result);
             }}>
-              <img alt="" src={result.profileImage}></img>
+              <img alt="" src={result.image}></img>
               <p>{result.name}</p>
             </div>)
           })}

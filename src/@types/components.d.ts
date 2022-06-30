@@ -35,7 +35,7 @@ interface IMeetingCard {
   title?: string;
   time?: string;
   location?: string;
-  participants?: Array<IParticipant>;
+  participants?: Array<ICreateUserResponse>;
 }
 
 interface IPollingChoiceCard {

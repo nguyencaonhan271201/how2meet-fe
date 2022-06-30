@@ -5,165 +5,61 @@ import { MeetingCard } from '../../components/MeetingCard/MeetingCard';
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useHistory } from 'react-router-dom';
+import { doGetMeetings, doGetUserByFirebaseID, RootState, useAppDispatch } from '../../redux';
+import { useSelector } from 'react-redux';
+import { getCurrentDateFullString } from '../../helpers/date';
 
 export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
   document.title = "How2Meet? | Meetings";
 
-  //const [futureList, setFutureList] = useState<Array<any>>([]);
-  //const [currentList, setCurrentList] = useState<Array<any>>([]);
-  //const [archivedList, setArchivedList] = useState<Array<any>>([]);
+  const [futureList, setFutureList] = useState<Array<any>>([]);
+  const [currentList, setCurrentList] = useState<Array<any>>([]);
+  const [archivedList, setArchivedList] = useState<Array<any>>([]);
 
   const history = useHistory();
+  const dispatch = useAppDispatch();
+  const { user } = useSelector(
+    (state: RootState) => state.loginSlice,
+  );
+  const { meetings } = useSelector(
+    (state: RootState) => state.meetingSlice,
+  );
 
-  let currentList = [
-    {
-      meetingID: 0,
-      type: 0,
-      title: "Test",
-      time: "",
-      location: "",
-      status: 0,
-      participants: [
-        {
-          name: "Nhan Nguyen Cao",
-          profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F1.jpg?alt=media&token=54729427-14b6-4be6-a26b-1cca524d67ff"
-        },
-        {
-          name: "Nhan Nguyen Cao",
-          profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F2.jpg?alt=media&token=9c5c8f2b-a18b-467a-bf5a-9deaedd5056d"
-        }
-      ],
-    },
-    {
-      meetingID: 0,
-      type: 1,
-      title: "Test",
-      time: "",
-      location: "",
-      status: 0,
-      participants: [
-        {
-          name: "Nhan Nguyen Cao",
-          profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F1.jpg?alt=media&token=54729427-14b6-4be6-a26b-1cca524d67ff"
-        },
-        {
-          name: "Nhan Nguyen Cao",
-          profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F2.jpg?alt=media&token=9c5c8f2b-a18b-467a-bf5a-9deaedd5056d"
-        }
-      ],
-    },
-    {
-      meetingID: 0,
-      type: 0,
-      title: "Test",
-      time: "",
-      location: "",
-      status: 0,
-      participants: [
-        {
-          name: "Nhan Nguyen Cao",
-          profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F1.jpg?alt=media&token=54729427-14b6-4be6-a26b-1cca524d67ff"
-        },
-        {
-          name: "Nhan Nguyen Cao",
-          profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F2.jpg?alt=media&token=9c5c8f2b-a18b-467a-bf5a-9deaedd5056d"
-        }
-      ],
-    },
-    {
-      meetingID: 0,
-      type: 1,
-      title: "Test",
-      time: "",
-      location: "",
-      status: 0,
-      participants: [
-        {
-          name: "Nhan Nguyen Cao",
-          profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F1.jpg?alt=media&token=54729427-14b6-4be6-a26b-1cca524d67ff"
-        },
-        {
-          name: "Nhan Nguyen Cao",
-          profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F2.jpg?alt=media&token=9c5c8f2b-a18b-467a-bf5a-9deaedd5056d"
-        }
-      ],
-    }
-  ]
+  //Hooks
+  useEffect(() => {
+    if (localStorage.getItem('firebase_id'))
+      dispatch(doGetUserByFirebaseID({
+        firebase_id: localStorage.getItem('firebase_id') || ''
+      }))
+  }, []);
 
-  let archivedList = [
-    {
-      meetingID: 0,
-      type: 0,
-      title: "Test",
-      time: "17/01/22",
-      location: "Baozi",
-      status: 0,
-      participants: [
-        {
-          name: "Nhan Nguyen Cao",
-          profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F1.jpg?alt=media&token=54729427-14b6-4be6-a26b-1cca524d67ff"
-        },
-        {
-          name: "Nhan Nguyen Cao",
-          profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F2.jpg?alt=media&token=9c5c8f2b-a18b-467a-bf5a-9deaedd5056d"
-        }
-      ],
-    },
-    {
-      meetingID: 0,
-      type: 1,
-      title: "Test",
-      time: "17/01/22",
-      location: "Baozi",
-      status: 0,
-      participants: [
-        {
-          name: "Nhan Nguyen Cao",
-          profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F1.jpg?alt=media&token=54729427-14b6-4be6-a26b-1cca524d67ff"
-        },
-        {
-          name: "Nhan Nguyen Cao",
-          profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F2.jpg?alt=media&token=9c5c8f2b-a18b-467a-bf5a-9deaedd5056d"
-        }
-      ],
-    },
-    {
-      meetingID: 0,
-      type: 0,
-      title: "Test",
-      time: "17/01/22",
-      location: "Baozi",
-      status: 0,
-      participants: [
-        {
-          name: "Nhan Nguyen Cao",
-          profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F1.jpg?alt=media&token=54729427-14b6-4be6-a26b-1cca524d67ff"
-        },
-        {
-          name: "Nhan Nguyen Cao",
-          profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F2.jpg?alt=media&token=9c5c8f2b-a18b-467a-bf5a-9deaedd5056d"
-        }
-      ],
-    },
-    {
-      meetingID: 0,
-      type: 1,
-      title: "Test",
-      time: "17/01/22",
-      location: "Baozi",
-      status: 0,
-      participants: [
-        {
-          name: "Nhan Nguyen Cao",
-          profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F1.jpg?alt=media&token=54729427-14b6-4be6-a26b-1cca524d67ff"
-        },
-        {
-          name: "Nhan Nguyen Cao",
-          profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F2.jpg?alt=media&token=9c5c8f2b-a18b-467a-bf5a-9deaedd5056d"
-        }
-      ],
+  useEffect(() => {
+    if (user?.firebase_id) {
+      dispatch(doGetMeetings({
+        firebase_id: user.firebase_id
+      }))
     }
-  ]
+  }, [user]);
+
+  useEffect(() => {
+    let getCurrentList = [] as any;
+    let getArchivedList = [] as any;
+
+    meetings?.forEach((meeting: any) => {
+      if (Date.parse(meeting.date[1]) > Date.now()) {
+        getCurrentList.push(meeting);
+      } else {
+        getArchivedList.push(meeting);
+      }
+    })
+
+    setCurrentList(getCurrentList);
+    setArchivedList(getArchivedList);
+  }, [meetings]);
+
+  useEffect(() => {
+    console.log(currentList);
+  }, [currentList]);
 
   return (
     <div className="meetings">
@@ -179,15 +75,16 @@ export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
 
         <div className="meetings__list--container">
           <div className="meetings__list">
-            {currentList.map(meeting => (
+            {currentList.map((meeting: any) => (
               <MeetingCard
-                meetingID={meeting.meetingID}
-                isCurrent={true}
-                type={meeting.type}
+                meetingID={meeting._id}
+                isCurrent={false}
+                type={meeting.isBonding ? 1 : 0}
                 title={meeting.title}
-                time={meeting.time}
-                location={meeting.location}
-                participants={meeting.participants}
+                time={`${getCurrentDateFullString(new Date(Date.parse(meeting.date[0])))} - 
+                ${getCurrentDateFullString(new Date(Date.parse(meeting.date[1])))}`}
+                location={""}
+                participants={meeting.invitators}
               ></MeetingCard>
             ))}
           </div>
@@ -201,13 +98,14 @@ export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
           <div className="meetings__list">
             {archivedList.map(meeting => (
               <MeetingCard
-                meetingID={meeting.meetingID}
+                meetingID={meeting._id}
                 isCurrent={false}
-                type={meeting.type}
+                type={meeting.isBonding ? 1 : 0}
                 title={meeting.title}
-                time={meeting.time}
-                location={meeting.location}
-                participants={meeting.participants}
+                time={`${getCurrentDateFullString(new Date(Date.parse(meeting.date[0])))} - 
+              ${getCurrentDateFullString(new Date(Date.parse(meeting.date[1])))}`}
+                location={""}
+                participants={meeting.invitators}
               ></MeetingCard>
             ))}
           </div>
