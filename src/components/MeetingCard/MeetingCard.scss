@@ -52,7 +52,7 @@
 
   &__info {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
 
     &--detail {
       display: flex;
@@ -70,7 +70,7 @@
 
       &__text {
         display: inline-block;
-        font-size: 25px;
+        font-size: 20px;
 
         &--current {
           font-size: 15px;

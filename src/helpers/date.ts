@@ -1,7 +1,7 @@
 import moment from 'moment';
 
-export const getCurrentDateFullString = () => {
-  return moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+export const getCurrentDateFullString = (date: Date) => {
+  return moment(date).format('DD/MM/YYYY');
 };
 
 export const getMonthNameFromIndex = (i: number) => {

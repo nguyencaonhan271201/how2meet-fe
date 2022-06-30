@@ -19,6 +19,18 @@ interface ILoginSlice {
   updateProfileSuccess?: boolean;
 }
 
+interface ISearchUserSlice {
+  searchResults?: Array<ICreateUserResponse>;
+  isSearchingUser?: boolean;
+  searchUserError?: any;
+}
+
 interface IMeetingSlice {
+  isCreatingNewMeeting?: boolean;
+  createNewMeetingSuccess?: boolean;
+  createNewMeetingError?: any;
   
+  meetings?: Array<ICreateMeetingResponse>;
+  gettingMeetingsError?: any;
+  isGettingMeetings?: boolean;
 }

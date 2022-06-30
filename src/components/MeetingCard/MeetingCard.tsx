@@ -29,19 +29,19 @@ export const MeetingCard: React.FC<IMeetingCard> = ({
             {isCurrent ? "awaiting responses..." : time}
           </p>
         </div>
-        <div className="meeting-card__info--detail">
+        {location !== "" && <div className="meeting-card__info--detail">
           <FontAwesomeIcon icon={faMapMarkerAlt} />
           <p className={`meeting-card__info--detail__text ${isCurrent ? "meeting-card__info--detail__text--current" : ""}`}>
             {isCurrent ? "awaiting responses..." : location}
           </p>
-        </div>
+        </div>}
       </div>
 
       <div className="meeting-card__participants">
         {participants?.map((participant, index) => (
           <img
             className="meeting-card__participant"
-            src={participant.profileImage}
+            src={participant.image}
             style={{
               zIndex: index + 1
             }}></img>

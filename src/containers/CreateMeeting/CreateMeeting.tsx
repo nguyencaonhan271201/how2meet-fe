@@ -13,13 +13,24 @@ import { PollingChoiceCard } from '../../components/PollingChoiceCard/PollingCho
 import { SearchBar } from '../../components/SearchBar/SearchBar';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { doCreateMeeting, doGetUserByFirebaseID, resetMeetingCreationStatus, RootState, useAppDispatch } from '../../redux';
+import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
   document.title = "How2Meet? | New Meeting";
+  const { user } = useSelector(
+    (state: RootState) => state.loginSlice,
+  );
+  const { isCreatingNewMeeting, createNewMeetingSuccess } = useSelector(
+    (state: RootState) => state.meetingSlice,
+  );
 
   const [currentPage, setCurrentPage] = useState<number>(0);
   const MySwal = withReactContent(Swal);
-  const numberOfPages = 5;
+  const numberOfPages = 4;
+  const dispatch = useAppDispatch();
+  const history = useHistory();
 
   //Page 0
   const [meetingTitle, setMeetingTitle] = useState<string>("");
@@ -33,20 +44,12 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
   const [renderCalendar, setRenderCalendar] = useState<number>(0);
 
   //Page 2
-  const [showingWeek, setShowingWeek] = useState<number>(0);
-  const isDragging = useRef<boolean>(false);
-  const isSelecting = useRef<boolean>(false);
-  const startPosition = useRef<number>(-1);
-  const [showingSelectors, setShowingSelectors] = useState<Array<any>>([]);
-  const mouseEnterNew = useRef<boolean>(false);
-
-  //Page 3
   const [pollOptions, setPollOptions] = useState<Array<any>>([]);
   const [letUserAdd, setLetUserAdd] = useState<boolean>(false);
   const [choiceLimit, setChoiceLimit] = useState<number>(1);
   const [isLimitChoices, setIsLimitChoices] = useState<boolean>(false);
 
-  //Page 4
+  //Page 3
   const [isPublic, setIsPublic] = useState<boolean>(false);
   const [selectedInvitators, setSelectedInvitators] = useState<Array<any>>([]);
   const [meetingID, setMeetingID] = useState<string>("");
@@ -57,13 +60,39 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
   }, [inputBlocks]);
 
   useEffect(() => {
+    console.log(pollOptions);
+  }, [pollOptions]);
+
+  useEffect(() => {
     generateCalendar();
   }, [fromDate, toDate]);
 
   useEffect(() => {
     //Generate random ID token for the meeting
     setMeetingID((Math.random() + 1).toString(36).substring(6));
+
+    if (localStorage.getItem('firebase_id'))
+      dispatch(doGetUserByFirebaseID({
+        firebase_id: localStorage.getItem('firebase_id') || ''
+      }))
   }, []);
+
+  useEffect(() => {
+    if (!isCreatingNewMeeting && createNewMeetingSuccess) {
+      MySwal.close();
+
+      MySwal.fire({
+        icon: 'success',
+        title: 'Success...',
+        text: 'Your meeting is created successfully!',
+      })
+        .then(() => {
+          dispatch(resetMeetingCreationStatus());
+          history.push("/meetings")
+          return;
+        })
+    }
+  }, [isCreatingNewMeeting, createNewMeetingSuccess]);
 
   //Functions
   const generateCalendar = () => {
@@ -150,130 +179,8 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
       }
     }
 
+    console.log(inputBlocks);
     setCurrentPage(currentPage + 1);
-  }
-
-  const onMouseDown = (e: any, indexInWeek: number) => {
-    isDragging.current = true;
-    startPosition.current = parseInt(e.target.getAttribute("data-time-slot"));
-    let currentIndex = parseInt(e.target.getAttribute("data-time-slot"));
-
-    //If the first selected box is empty slot => The current action is selecting the slots
-    isSelecting.current = inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[currentIndex].status === 0;
-
-    let inputBlocksClone = inputBlocks;
-    if (isSelecting.current && inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[currentIndex].status !== 2) {
-      inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[currentIndex] = {
-        status: 2,
-        selectors: inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[currentIndex].selectors
-      }
-    } else if (!isSelecting.current && inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[currentIndex].status !== 0) {
-      inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[currentIndex] = {
-        status: 0,
-        selectors: inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[currentIndex].selectors
-      }
-    }
-
-    setInputBlocks(inputBlocksClone);
-    setRenderCalendar(renderCalendar + 1);
-  }
-
-  const onMouseUp = (e: any, indexInWeek: number) => {
-    isDragging.current = false;
-    isSelecting.current = false;
-    startPosition.current = -1;
-
-    let inputBlocksClone = inputBlocks;
-    let changed = false;
-    inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots.forEach((slot: any, index: number) => {
-      if (slot.status === 2) {
-        inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[index] = {
-          status: 1,
-          selectors: inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[index].selectors
-        }
-        changed = true;
-      }
-    })
-
-    if (changed) {
-      setInputBlocks(inputBlocksClone);
-      setRenderCalendar(renderCalendar + 1);
-    }
-  }
-
-  const onMouseEnter = (e: any, indexInWeek: number) => {
-    mouseEnterNew.current = true;
-    let index = parseInt(e.target.getAttribute("data-time-slot"));
-
-    //Check if selected by me
-    if (inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[index].status === 1) {
-      setShowingSelectors([...inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[index].selectors,
-      {
-        name: "Nguyen Cao Nhan",
-        profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F3.jpg?alt=media&token=550fd4ec-7aa7-4481-9b1d-f83c1cf1c053"
-      }])
-    } else {
-      setShowingSelectors(inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[index].selectors);
-    }
-  }
-
-  const onMouseOut = (e: any, indexInWeek: number) => {
-    mouseEnterNew.current = false;
-    setTimeout(() => {
-      if (!mouseEnterNew.current) {
-        setShowingSelectors([]);
-        mouseEnterNew.current = false;
-      }
-    }, 500);
-  }
-
-  const onMouseMove = (e: any, indexInWeek: number) => {
-    if (isDragging.current) {
-      let currentPosition = parseInt(e.target.getAttribute("data-time-slot"));
-      if (currentPosition) {
-        let inputBlocksClone = inputBlocks;
-        let changed = false;
-
-        if (currentPosition >= startPosition.current) {
-          for (let i = startPosition.current; i <= currentPosition; i++) {
-            if (isSelecting.current && inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[i].status !== 2) {
-              inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[i] = {
-                status: 2,
-                selectors: inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[i].selectors
-              }
-              changed = true;
-            } else if (!isSelecting.current && inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[i].status !== 0) {
-              inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[i] = {
-                status: 0,
-                selectors: inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[i].selectors
-              }
-              changed = true;
-            }
-          }
-        } else {
-          for (let i = currentPosition; i <= startPosition.current; i++) {
-            if (isSelecting.current && inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[i].status !== 2) {
-              inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[i] = {
-                status: 2,
-                selectors: inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[i].selectors
-              }
-              changed = true;
-            } else if (!isSelecting.current && inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[i].status !== 0) {
-              inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[i] = {
-                status: 0,
-                selectors: inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[i].selectors
-              }
-              changed = true;
-            }
-          }
-        }
-
-        if (changed) {
-          setInputBlocks(inputBlocksClone);
-          setRenderCalendar(renderCalendar + 1);
-        }
-      }
-    }
   }
 
   const addAction = () => {
@@ -320,7 +227,7 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
         let title = (document?.getElementById('title') as HTMLInputElement).value || "";
         let location = (document?.getElementById('location') as HTMLInputElement).value || "";
         let link = (document?.getElementById('link') as HTMLInputElement).value || "";
-        let description = (document?.getElementById('title') as HTMLTextAreaElement).value || "";
+        let description = (document?.getElementById('description') as HTMLTextAreaElement).value || "";
         let type = (document?.getElementById('type') as HTMLSelectElement).value || "0";
 
         let errorText = "";
@@ -364,9 +271,38 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
   }
 
   const createMeeting = () => {
+    MySwal.showLoading();
+
+    let dateBlocks = [] as any;
+    (inputBlocks as any).forEach((block: any) => {
+      block.blocks?.map((block: any) => {
+        dateBlocks = [...dateBlocks, block];
+      })
+    })
+
     //TODO: Wrap up information
+    let meetingObject = {
+      title: meetingTitle.toUpperCase(),
+      description: description,
+      creator: user?.firebase_id,
+      date: [fromDate, toDate],
+      isBonding: isBonding,
+      dateBlocks: dateBlocks,
+
+      //Poll options
+      poll: pollOptions,
+      pollLetUserAdd: letUserAdd,
+      pollIsLimitChoice: isLimitChoices,
+      pollChoicesLimit: choiceLimit,
+
+      //Choice options
+      isPublic: isPublic,
+      meetingID: meetingID,
+      invitators: !isPublic ? [...selectedInvitators, user] : [user]
+    } as IAPIPostNewMeeting;
 
     //TODO2: Call API to create meeting
+    dispatch(doCreateMeeting(meetingObject));
   }
 
   return (
@@ -399,7 +335,7 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
         </span>
 
         <p className="create-meeting__hosted-title">
-          host by ncnhan
+          host by {user?.name || user?.email}
         </p>
 
         <textarea
@@ -444,7 +380,7 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
             style={{ color: "var(--theme-green)", marginRight: "4px" }}
           >bonding</span> : "meeting "}
 
-          host by ncnhan
+          host by {user?.name || user?.email}
         </p>
 
         <div className="create-meeting__calendar">
@@ -460,7 +396,7 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
                   {week.blocks.map((block: any, indexInWeek: number) => {
                     return (
                       <div
-                        className={`create-meeting__calendar__week-day
+                        className={`no-select create-meeting__calendar__week-day
                         ${!block.isSelectable ? "create-meeting__calendar__week-day--disabled" : ""}
                         ${block.isSelectable && block.status === 0 ? "create-meeting__calendar__week-day--busy" : ""}`}
                         onClick={() => {
@@ -469,7 +405,7 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
                           }
                         }}
                       >
-                        <h4>{block.date.getDate()}</h4>
+                        <h4 className="no-select">{block.date.getDate()}</h4>
                       </div>
                     )
                   })}
@@ -480,122 +416,7 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
         </div>
       </div>}
 
-      {currentPage === 2 && <div className="create-meeting__time-pick">
-        <h1 className="create-meeting__title">{meetingTitle !== "" ? meetingTitle : "Meeting"}
-        </h1>
-
-        <div className="create-meeting__time__week-time">
-          <FontAwesomeIcon
-            icon={faArrowLeft}
-            onClick={() => {
-              if (showingWeek > 0)
-                setShowingWeek(showingWeek - 1);
-            }}
-            style={{
-              opacity: showingWeek === 0 ? "0" : "1",
-              cursor: "pointer"
-            }}
-          ></FontAwesomeIcon>
-
-          <div className="create-meeting__time__week-main">
-            <React.Fragment>
-              {
-                <p className="create-meeting__time__month-name">
-                  {getMonthNameFromIndex(inputBlocks[showingWeek].blocks[6].date.getMonth())}
-                </p>
-              }
-
-              <div className="create-meeting__time__week">
-                <div className="create-meeting__left-ruler">
-                  {[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24].map(number => {
-                    return <p style={{ marginBottom: "0" }}>{number}:00</p>
-                  })}
-                </div>
-
-                {inputBlocks[showingWeek].blocks.map((block: any, indexInWeek: number) => {
-                  return (
-                    <div className="create-meeting__week-day-time">
-                      <div
-                        className={`create-meeting__time__week-day
-                        ${!block.isSelectable ? "create-meeting__time__week-day--disabled" : ""}
-                        ${block.isSelectable && block.status === 0 ? "create-meeting__time__week-day--busy" : ""}`}
-                      >
-                        <h4>{block.date.getDate()}</h4>
-                      </div>
-                      <div className={`create-meeting__time__time-range
-                        ${!block.isSelectable ? "create-meeting__time__time-range--disabled" : ""}
-                        ${block.isSelectable && block.status === 0 ? "create-meeting__time__time-range--disabled" : ""}`}>
-                        {block.isSelectable && block.status !== 0 &&
-                          Array.from(Array(32).keys()).map((key: number) => {
-                            return (
-                              <div
-                                className={`create-meeting__time__time-range--time-slot 
-                                  ${key % 2 === 1 && key !== 31 ? "create-meeting__time__time-range--time-slot--divider" : ""}`}
-                                onMouseDown={(e: any) => { onMouseDown(e, indexInWeek) }}
-                                onMouseUp={(e: any) => { onMouseUp(e, indexInWeek) }}
-                                onMouseMove={(e: any) => { onMouseMove(e, indexInWeek) }}
-                                onMouseEnter={(e: any) => { onMouseEnter(e, indexInWeek) }}
-                                onMouseOut={(e: any) => { onMouseOut(e, indexInWeek) }}
-                                style={{
-                                  background: block.timeSlots?.[key].status === 2 ? "#446784" :
-                                    block.timeSlots?.[key].status === 1 ? "#BCCC9A" :
-                                      block.timeSlots?.[key].selectors?.length === 0 ? "none" : "rgba(188, 204, 154, 0.41)"
-                                }}
-                                draggable="false"
-                              >
-                                <span
-                                  className="create-meeting__tooltip-span"
-                                  data-tip
-                                  data-for={`tooltip-${indexInWeek}-${key}`}
-                                  style={{ cursor: 'pointer' }}
-                                  data-time-slot={key}
-                                  draggable="false"
-                                ></span>
-                                <ReactTooltip id={`tooltip-${indexInWeek}-${key}`} place="right" effect="solid">
-                                  <p
-                                    className="no-select"
-                                  >{getTimeText(key)}</p>
-                                </ReactTooltip>
-                              </div>
-                            )
-                          })}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </React.Fragment>
-          </div>
-
-          <FontAwesomeIcon
-            icon={faArrowRight}
-            onClick={() => {
-              if (showingWeek < inputBlocks.length - 1)
-                setShowingWeek(showingWeek + 1);
-            }}
-            style={{
-              opacity: showingWeek === inputBlocks.length - 1 ? "0" : "1",
-              cursor: "pointer"
-            }}
-          ></FontAwesomeIcon>
-        </div>
-
-        {showingSelectors.length > 0 && <div className="create-meeting__selectors">
-          <h5 className="create-meeting__selectors--count">{showingSelectors.length}/{showingSelectors.length}</h5>
-          <div className="create-meeting__selectors--container">
-            {showingSelectors.map((selector: any) => {
-              return (
-                <div className="create-meeting__selectors--single">
-                  <img src={selector.profileImage}></img>
-                  <p style={{ margin: 0 }}>{selector.name}</p>
-                </div>
-              )
-            })}
-          </div>
-        </div>}
-      </div>}
-
-      {currentPage === 3 && <div className="create-meeting__action-polling">
+      {currentPage === 2 && <div className="create-meeting__action-polling">
         <h1 className="create-meeting__title">{meetingTitle !== "" ? meetingTitle : "Meeting"}
         </h1>
 
@@ -652,7 +473,7 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
         </div>
       </div>}
 
-      {currentPage === 4 && <div className="create-meeting__confirmation">
+      {currentPage === 3 && <div className="create-meeting__confirmation">
         <h1 className="create-meeting__title">{meetingTitle !== "" ? meetingTitle : "Meeting"}
         </h1>
 

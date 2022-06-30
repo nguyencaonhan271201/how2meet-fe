@@ -5,3 +5,4 @@ export * from './appSlice/test';
 export * from './apiSlice/test';
 export * from './apiSlice/loginSlice';
 export * from './apiSlice/meetingSlice';
+export * from './apiSlice/userSearchSlice';
