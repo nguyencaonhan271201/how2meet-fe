@@ -22,7 +22,7 @@ export const MeetingCard: React.FC<IMeetingCard> = ({
       <p className="meeting-card__type">{type === 0 ? "Meeting" : "Bonding"}</p>
       <p className="meeting-card__title">{title}</p>
 
-      <div className="meeting-card__info">
+      <div className={`meeting-card__info ${location !== "" ? "meeting-card__info--2-rows" : ""}`}>
         <div className="meeting-card__info--detail">
           <FontAwesomeIcon icon={faClock} />
           <p className={`meeting-card__info--detail__text ${isCurrent ? "meeting-card__info--detail__text--current" : ""}`}>

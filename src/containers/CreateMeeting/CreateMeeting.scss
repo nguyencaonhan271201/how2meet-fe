@@ -117,6 +117,14 @@
     margin-right: 10px;
   }
 
+  &__location-input input {
+    border: none;
+    outline: none;
+    padding: 5px;
+    margin-top: 5px;
+    text-align: center;
+  }
+
   &__calendar {
     width: 65%;
     max-height: 70vh;

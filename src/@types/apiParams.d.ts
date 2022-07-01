@@ -28,6 +28,7 @@ interface IAPISearchUserByQuery {
 interface IAPIPostNewMeeting {
   title?: string;
   description?: string;
+  location?: string;
   creator?: string;
   date?: Array<Date>;
   isBonding?: boolean;

@@ -54,6 +54,10 @@
     display: grid;
     grid-template-columns: 1fr;
 
+    &--2-rows {
+      grid-template-columns: 1fr 1fr;
+    }
+
     &--detail {
       display: flex;
       align-items: center;

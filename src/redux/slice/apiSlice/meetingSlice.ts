@@ -12,6 +12,12 @@ export const doGetMeetings = createAsyncThunk('apiMeeting@get/meetings', async (
   return result.data;
 });
 
+export const doUpdateMeetingParticipantsProfile 
+= createAsyncThunk('apiMeeting@post/updateMeetingParticipantsProfile', async (param: IAPIPostNewUser) => {
+  const result: AxiosResponse = await apiMeeting.updateMeetingParticipantsProfile(param);
+  return result.data;
+});
+
 const initialState = {
   isCreatingNewMeeting: false,
   createNewMeetingSuccess: false,
@@ -19,7 +25,10 @@ const initialState = {
 
   meetings: [],
   isGettingMeetings: false,
-  gettingMeetingsError: {}
+  gettingMeetingsError: {},
+
+  isUpdateMeetingParticipantsProfile: false,
+  updateMeetingParticipantsProfileError: {}
 } as IMeetingSlice;
 
 const slice = createSlice({
@@ -61,6 +70,20 @@ const slice = createSlice({
     builder.addCase(doGetMeetings.rejected, (state, action) => {
       state.isGettingMeetings = false;
       state.gettingMeetingsError = {
+        error: "Error occured"
+      }
+    });
+
+    //doUpdateMeetingParticipantsProfile
+    builder.addCase(doUpdateMeetingParticipantsProfile.pending, (state) => {
+      state.isUpdateMeetingParticipantsProfile = true;
+    });
+    builder.addCase(doUpdateMeetingParticipantsProfile.fulfilled, (state, action) => {
+      state.isUpdateMeetingParticipantsProfile = false;
+    });
+    builder.addCase(doUpdateMeetingParticipantsProfile.rejected, (state, action) => {
+      state.isUpdateMeetingParticipantsProfile = false;
+      state.updateMeetingParticipantsProfileError = {
         error: "Error occured"
       }
     });

@@ -34,6 +34,7 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
 
   //Page 0
   const [meetingTitle, setMeetingTitle] = useState<string>("");
+  const [location, setLocation] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [fromDate, setFromDate] = useState<Date>(new Date());
   const [toDate, setToDate] = useState<Date>(new Date());
@@ -284,6 +285,7 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
     let meetingObject = {
       title: meetingTitle.toUpperCase(),
       description: description,
+      location: location,
       creator: user?.firebase_id,
       date: [fromDate, toDate],
       isBonding: isBonding,
@@ -362,6 +364,14 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
             onChange={(date: any) => setToDate(date)}
             minDate={fromDate}
           />
+        </div>
+
+        <div className="create-meeting__location-input">
+          <input
+            type="text"
+            value={location}
+            onChange={(e: any) => setLocation(e.target.value)}
+            placeholder="location"></input>
         </div>
 
       </div>}

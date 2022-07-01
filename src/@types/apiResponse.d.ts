@@ -25,6 +25,7 @@ interface ICreateMeetingResponse extends ICreateResponse {
   title?: string;
   description?: string;
   creator?: string;
+  location?: string;
   date?: Array<Date>;
   isBonding?: boolean;
   dateBlocks?: any;

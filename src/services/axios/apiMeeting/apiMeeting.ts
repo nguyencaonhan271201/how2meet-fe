@@ -10,5 +10,10 @@ export const apiMeeting = {
   getMeetings: (param: IAPIGetMeetings) => {
     const url = '/meeting/findByFirebaseID';
     return axiosTest.get(url + "/" + param.firebase_id);
-  }
+  },
+
+  updateMeetingParticipantsProfile: (param: IAPIPostNewUser) => {
+    const url = '/meeting/updateMeetingParticipantsProfile';
+    return axiosTest.post(url, param);
+  },
 };

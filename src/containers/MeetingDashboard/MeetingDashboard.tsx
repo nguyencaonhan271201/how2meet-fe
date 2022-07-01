@@ -83,7 +83,7 @@ export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
                 title={meeting.title}
                 time={`${getCurrentDateFullString(new Date(Date.parse(meeting.date[0])))} - 
                 ${getCurrentDateFullString(new Date(Date.parse(meeting.date[1])))}`}
-                location={""}
+                location={meeting.location}
                 participants={meeting.invitators}
               ></MeetingCard>
             ))}
@@ -104,7 +104,7 @@ export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
                 title={meeting.title}
                 time={`${getCurrentDateFullString(new Date(Date.parse(meeting.date[0])))} - 
               ${getCurrentDateFullString(new Date(Date.parse(meeting.date[1])))}`}
-                location={""}
+                location={meeting.location}
                 participants={meeting.invitators}
               ></MeetingCard>
             ))}
