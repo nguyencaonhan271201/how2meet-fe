@@ -78,6 +78,10 @@ const slice = createSlice({
 
     temporarilySavedUserToAdd(state, action) {
       state.temporarilySavedUserToAdd = action.payload.user;
+    },
+
+    updateMeetingPublic(state, action) {
+      state.meetingByID.isPublic = action.payload.isPublic;
     }
   },
   extraReducers: (builder) => {
@@ -178,5 +182,5 @@ const slice = createSlice({
 });
 
 const { reducer, actions } = slice;
-export const { resetMeetingCreationStatus, temporarilySavedUserToAdd } = actions;
+export const { resetMeetingCreationStatus, temporarilySavedUserToAdd, updateMeetingPublic } = actions;
 export default reducer;

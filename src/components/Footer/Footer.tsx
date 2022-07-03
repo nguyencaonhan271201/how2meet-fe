@@ -79,7 +79,7 @@ export const Footer: React.FC<IFooter> = ({ }) => {
         <ul>
           <li onClick={() => { history.push("/meetings") }}>Dashboard</li>
           <li onClick={() => { history.push("/new-meeting") }}>New meeting</li>
-          <li onClick={() => { history.push("/edit-account") }}>Edit Account</li>
+          <li onClick={() => { history.push("/edit-account") }}>Edit account</li>
           <li onClick={() => { logout(); history.push("/auth"); }}>Log out</li>
         </ul>
       </div>

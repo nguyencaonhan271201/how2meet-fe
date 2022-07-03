@@ -55,6 +55,10 @@ export const SearchBar: React.FC<ISearchBar> = ({
       dispatch(doGetUserByFirebaseID({
         firebase_id: localStorage.getItem('firebase_id') || ''
       }))
+
+    if (selected) {
+      setSelectedList(selected);
+    }
   }, []);
 
   useEffect(() => {

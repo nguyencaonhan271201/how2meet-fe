@@ -130,25 +130,6 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
           }),
         })
 
-        //FOR TESTING ONLY
-        if (start.getDate() === 28 && start.getMonth() === 5) {
-          for (let i = 20; i < 28; i++) {
-            thisWeek[thisWeek.length - 1].timeSlots[i] = {
-              status: 0,
-              selectors: [
-                {
-                  name: "Nhan Nguyen Cao",
-                  profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F1.jpg?alt=media&token=54729427-14b6-4be6-a26b-1cca524d67ff"
-                },
-                {
-                  name: "Nhan Nguyen Cao",
-                  profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F2.jpg?alt=media&token=9c5c8f2b-a18b-467a-bf5a-9deaedd5056d"
-                },
-              ]
-            }
-          }
-        }
-
         start.setTime(start.getTime() + (24 * 60 * 60 * 1000));
       }
 

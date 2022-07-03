@@ -1,4 +1,4 @@
-import './CreateMeeting.scss';
+import './EditMeeting.scss';
 import React, { useEffect, useState, useRef } from 'react';
 import { faArrowLeft, faArrowRight, faLink, faCheck, faKey } from '@fortawesome/free-solid-svg-icons'
 import { faCopy } from '@fortawesome/free-regular-svg-icons'
@@ -13,31 +13,42 @@ import { PollingChoiceCard } from '../../components/PollingChoiceCard/PollingCho
 import { SearchBar } from '../../components/SearchBar/SearchBar';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { doCreateMeeting, doGetUserByFirebaseID, resetMeetingCreationStatus, RootState, useAppDispatch } from '../../redux';
+import { doCreateMeeting, doGetMeetingByMeetingID, doGetUserByFirebaseID, doUpdateMeeting, resetMeetingCreationStatus, RootState, updateMeetingPublic, useAppDispatch } from '../../redux';
 import { useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
+import { decrypt } from '../../helpers/password';
+import { PollingChoiceSelectableCard } from '../../components/PollingChoiceSelectableCard/PollingChoiceSelectableCard';
 
 export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
   document.title = "How2Meet? | Edit Meeting";
+  let { id: paramMeetingID } = useParams() as any;
+
   const { user } = useSelector(
     (state: RootState) => state.loginSlice,
   );
-  const { isCreatingNewMeeting, createNewMeetingSuccess } = useSelector(
+  const { isUpdateMeeting, updateMeetingSuccess } = useSelector(
+    (state: RootState) => state.meetingSlice,
+  );
+  const { meetingByID: meetingInfo } = useSelector(
     (state: RootState) => state.meetingSlice,
   );
 
   const [currentPage, setCurrentPage] = useState<number>(0);
   const MySwal = withReactContent(Swal);
-  const numberOfPages = 4;
+  const numberOfPages = 5;
   const dispatch = useAppDispatch();
   const history = useHistory();
+  const [changedDate, setChangedDate] = useState<boolean>(false);
 
   //Page 0
   const [meetingTitle, setMeetingTitle] = useState<string>("");
   const [location, setLocation] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [backupFromDate, setBackupFromDate] = useState<Date>(new Date());
+  const [backupToDate, setBackupToDate] = useState<Date>(new Date());
   const [fromDate, setFromDate] = useState<Date>(new Date());
   const [toDate, setToDate] = useState<Date>(new Date());
+  const [creator, setCreator] = useState<any>();
 
   //Page 1
   const [inputBlocks, setInputBlocks] = useState<Array<any>>([]);
@@ -45,15 +56,25 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
   const [renderCalendar, setRenderCalendar] = useState<number>(0);
 
   //Page 2
+  const [showingWeek, setShowingWeek] = useState<number>(0);
+  const isDragging = useRef<boolean>(false);
+  const isSelecting = useRef<boolean>(false);
+  const startPosition = useRef<number>(-1);
+  const [showingSelectors, setShowingSelectors] = useState<Array<any>>([]);
+  const mouseEnterNew = useRef<boolean>(false);
+
+  //Page 3
   const [pollOptions, setPollOptions] = useState<Array<any>>([]);
   const [letUserAdd, setLetUserAdd] = useState<boolean>(false);
   const [choiceLimit, setChoiceLimit] = useState<number>(1);
   const [isLimitChoices, setIsLimitChoices] = useState<boolean>(false);
+  const [countSelected, setCountSelected] = useState<number>(0);
 
-  //Page 3
+  //Page 4
   const [isPublic, setIsPublic] = useState<boolean>(false);
   const [selectedInvitators, setSelectedInvitators] = useState<Array<any>>([]);
   const [meetingID, setMeetingID] = useState<string>("");
+  const [update, setUpdate] = useState<number>(0);
   const [meetingPassword, setMeetingPassword] = useState<string>("");
 
   //Hooks
@@ -62,32 +83,54 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
   }, [inputBlocks]);
 
   useEffect(() => {
-    console.log(pollOptions);
-  }, [pollOptions]);
-
-  useEffect(() => {
-    generateCalendar();
+    //generateCalendar();
   }, [fromDate, toDate]);
 
   useEffect(() => {
-    //Generate random ID token for the meeting
-    setMeetingID((Math.random() + 1).toString(36).substring(6));
-    setMeetingPassword((Math.random() + 1).toString(36).substring(3));
-
     if (localStorage.getItem('firebase_id'))
       dispatch(doGetUserByFirebaseID({
         firebase_id: localStorage.getItem('firebase_id') || ''
       }))
+
+    MySwal.fire({
+      didOpen: () => {
+        MySwal.showLoading();
+      },
+      didClose: () => {
+        MySwal.hideLoading();
+      },
+      allowOutsideClick: false,
+    })
+
+    //This function checks whether the current user has the right to access the meeting
+    //Or navigate in case the meeting is public
+    dispatch(doGetMeetingByMeetingID({
+      meetingID: paramMeetingID
+    }))
   }, []);
 
   useEffect(() => {
-    if (!isCreatingNewMeeting && createNewMeetingSuccess) {
+    if (((localStorage.getItem('firebase_id') && user) || !localStorage.getItem('firebase_id'))
+      && meetingInfo && Object.keys(meetingInfo).length !== 0) {
+      checkForAccessRights();
+    }
+  }, [meetingInfo, user])
+
+  useEffect(() => {
+    if (((localStorage.getItem('firebase_id') && user) || !localStorage.getItem('firebase_id'))
+      && meetingInfo && Object.keys(meetingInfo).length !== 0) {
+      checkForAccessRights();
+    }
+  }, [user])
+
+  useEffect(() => {
+    if (!isUpdateMeeting && updateMeetingSuccess) {
       MySwal.close();
 
       MySwal.fire({
         icon: 'success',
         title: 'Success...',
-        text: 'Your meeting is created successfully!',
+        text: 'Your choice is saved successfully!',
       })
         .then(() => {
           dispatch(resetMeetingCreationStatus());
@@ -95,9 +138,31 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
           return;
         })
     }
-  }, [isCreatingNewMeeting, createNewMeetingSuccess]);
+  }, [isUpdateMeeting, updateMeetingSuccess]);
+
+  useEffect(() => {
+    //dispatch(updateMeetingPublic({ isPublic: isPublic }))
+  }, [isPublic]);
 
   //Functions
+  const checkForAccessRights = () => {
+    MySwal.close();
+
+    //Not logged in
+    if (!localStorage.getItem("firebaseLoggedIn") || localStorage.getItem("firebaseLoggedIn") === "0") {
+      history.push("/auth", { isRedirect: true });
+      return;
+    }
+
+    //Check if is the creator of the meeting
+    if (user.firebase_id !== meetingInfo?.creator.firebase_id) {
+      history.push("/meetings", { isNotValidMeeting: true });
+      return;
+    } else {
+      updateMeetingInformation();
+    }
+  }
+
   const generateCalendar = () => {
     let startWeek = getWeekNumber(fromDate);
     let endWeek = getWeekNumber(toDate);
@@ -128,25 +193,6 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
             selectors: []
           }),
         })
-
-        //FOR TESTING ONLY
-        if (start.getDate() === 28 && start.getMonth() === 5) {
-          for (let i = 20; i < 28; i++) {
-            thisWeek[thisWeek.length - 1].timeSlots[i] = {
-              status: 0,
-              selectors: [
-                {
-                  name: "Nhan Nguyen Cao",
-                  profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F1.jpg?alt=media&token=54729427-14b6-4be6-a26b-1cca524d67ff"
-                },
-                {
-                  name: "Nhan Nguyen Cao",
-                  profileImage: "https://firebasestorage.googleapis.com/v0/b/cpbo-storage.appspot.com/o/profile%2Fdefault%2F2.jpg?alt=media&token=9c5c8f2b-a18b-467a-bf5a-9deaedd5056d"
-                },
-              ]
-            }
-          }
-        }
 
         start.setTime(start.getTime() + (24 * 60 * 60 * 1000));
       }
@@ -180,10 +226,34 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
         })
         return;
       }
-    }
 
-    console.log(inputBlocks);
-    setCurrentPage(currentPage + 1);
+      if (changedDate) {
+        MySwal.fire({
+          title: "All of the participants' votes for free time slots will be lost permanently. Do you wish to continue?",
+          text: "You are changing the dates of the meeting!!!",
+          icon: "warning",
+          cancelButtonText: "No",
+          confirmButtonText: "Yes",
+          showCancelButton: true,
+          showConfirmButton: true
+        })
+          .then((willProceed) => {
+            if (willProceed.isConfirmed) {
+              generateCalendar();
+              setCurrentPage(currentPage + 1);
+            } else {
+              setFromDate(backupFromDate);
+              setToDate(backupToDate);
+              setCurrentPage(currentPage + 1);
+            }
+            return;
+          });
+      } else {
+        setCurrentPage(currentPage + 1);
+      }
+    } else {
+      setCurrentPage(currentPage + 1);
+    }
   }
 
   const addAction = () => {
@@ -258,7 +328,9 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
             location: location,
             link: link,
             description: description,
-            type: parseInt(type)
+            type: parseInt(type),
+            selectors: [],
+            creator: user?.firebase_id
           }
 
           let clonePollOptions = [...pollOptions, thisOption];
@@ -273,17 +345,133 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
     })
   }
 
-  const createMeeting = () => {
+  const deleteAction = (index: number) => {
     MySwal.fire({
-      didOpen: () => {
-        MySwal.showLoading();
-      },
-      didClose: () => {
-        MySwal.hideLoading();
-      },
-      allowOutsideClick: false,
+      title: "Are you sure want to remove this option?",
+      text: "All votes for this option will be deleted",
+      icon: "warning",
+      cancelButtonText: "No",
+      confirmButtonText: "Yes",
+      showCancelButton: true,
+      showConfirmButton: true
     })
+      .then((willDelete) => {
+        if (willDelete.isConfirmed) {
+          let clonePollOptions = [...pollOptions];
+          clonePollOptions.splice(index, 1);
+          setPollOptions(clonePollOptions);
+        }
+      });
+  }
 
+  const editAction = (index: number) => {
+    MySwal.fire({
+      title: 'Edit an option',
+      html: `
+          <div>
+            <label for="title" class="mr-2 mt-2 swal-label">title</label>
+            <input class="swal2-input" placeholder="title" type="text" id="title"><br>
+          </div>
+
+          <div>
+            <label for="location" class="mr-2 mt-2 swal-label">location</label>
+            <input class="swal2-input" placeholder="location" type="text" id="location"><br>
+          </div>
+
+          <div>
+            <label for="link" class="mr-2 mt-2 swal-label">link</label>
+            <input class="swal2-input" placeholder="link" type="text" id="link"><br>
+          </div>
+
+          <div>
+            <label for="description" class="mr-2 mt-2 swal-label">description</label>
+            <textarea class="swal2-input" placeholder="description" id="description"></textarea>
+          </div>
+
+          <div>
+            <label for="type" class="mr-2 mt-2 swal-label">type</label>
+            <select class="swal2-input" id="type">
+              <option value="0" selected>Dining</option>
+              <option value="1">Activities</option>
+            </select>
+          </div>
+
+          <div>
+            <button 
+            id="deleteAction"
+            type="button" class="swal2-cancel swal2-styled swal2-default-outline" style="display: inline-block; background-color: red;" aria-label="">
+            Delete</button>
+          </div>
+        `,
+      showCancelButton: true,
+      confirmButtonText: 'Edit',
+      confirmButtonColor: 'green',
+      cancelButtonColor: 'red',
+      showLoaderOnConfirm: true,
+      didOpen: () => {
+        let getAction = pollOptions[index];
+
+        (document?.getElementById('title') as HTMLInputElement).value = getAction.title;
+        (document?.getElementById('location') as HTMLInputElement).value = getAction.location;
+        (document?.getElementById('link') as HTMLInputElement).value = getAction.link;
+        (document?.getElementById('description') as HTMLInputElement).value = getAction.description;
+        (document?.getElementById('type') as HTMLInputElement).value = getAction.type;
+
+        (document?.getElementById('deleteAction') as HTMLButtonElement).addEventListener('click', () => {
+          deleteAction(index);
+        })
+      },
+      preConfirm: () => {
+        let title = (document?.getElementById('title') as HTMLInputElement).value || "";
+        let location = (document?.getElementById('location') as HTMLInputElement).value || "";
+        let link = (document?.getElementById('link') as HTMLInputElement).value || "";
+        let description = (document?.getElementById('description') as HTMLTextAreaElement).value || "";
+        let type = (document?.getElementById('type') as HTMLSelectElement).value || "0";
+
+        let errorText = "";
+        if (title === "") {
+          if (errorText !== "")
+            errorText += '<br>'
+          errorText += `please input the title.`
+        }
+
+        if (location === "") {
+          if (errorText !== "")
+            errorText += '<br>'
+          errorText += `please input the location.`
+        }
+
+        if (description === "") {
+          if (errorText !== "")
+            errorText += '<br>'
+          errorText += `please input the description.`
+        }
+
+        if (errorText === "") {
+          let thisOption = {
+            title: title,
+            location: location,
+            link: link,
+            description: description,
+            type: parseInt(type),
+            selectors: []
+          }
+
+          let clonePollOptions = [...pollOptions];
+          clonePollOptions[index] = thisOption;
+          setPollOptions(clonePollOptions);
+        } else {
+          MySwal.showValidationMessage(
+            errorText
+          )
+        }
+      },
+      allowOutsideClick: () => !MySwal.isLoading()
+    })
+  }
+
+  const saveMeeting = () => {
+    MySwal.showLoading();
 
     let dateBlocks = [] as any;
     (inputBlocks as any).forEach((block: any) => {
@@ -292,21 +480,13 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
       })
     })
 
-    let invitators = [];
-    if (!isPublic) {
-      invitators = [...selectedInvitators];
-      invitators.unshift(user);
-    } else {
-      invitators = [user];
-    }
-
     //TODO: Wrap up information
     let meetingObject = {
       title: meetingTitle.toUpperCase(),
       description: description,
       password: meetingPassword,
       location: location,
-      creator: user,
+      creator: creator,
       date: [fromDate, toDate],
       isBonding: isBonding,
       dateBlocks: dateBlocks,
@@ -320,11 +500,303 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
       //Choice options
       isPublic: isPublic,
       meetingID: meetingID,
-      invitators: invitators,
+      invitators: [...selectedInvitators]
     } as IAPIPostNewMeeting;
 
     //TODO2: Call API to create meeting
-    dispatch(doCreateMeeting(meetingObject));
+    dispatch(doUpdateMeeting({
+      meetingID: meetingID,
+      meetingInfo: meetingObject
+    }));
+  }
+
+  const eliminateMe = (arr: any) => {
+    let findMeIndex = -1;
+    let cloneArr = [...arr];
+
+    cloneArr.forEach((item: any, index: number) => {
+      if (item.firebase_id === user.firebase_id) {
+        findMeIndex = index;
+      }
+    })
+
+    if (findMeIndex > -1) {
+      cloneArr.splice(findMeIndex, 1);
+    }
+
+    return cloneArr;
+  }
+
+  const cloneInputBlocks = () => {
+    let inputBlocksClone = [...inputBlocks];
+    let returnBlocks = [];
+
+    inputBlocksClone.forEach((weekBlock: any) => {
+      let blocks = [];
+
+      weekBlock.blocks.forEach((dayBlock: any) => {
+        let timeSlots = [];
+
+        dayBlock.timeSlots.forEach((slot: any) => {
+          timeSlots.push({
+            status: slot.status,
+            selectors: [...slot.selectors]
+          })
+        })
+
+        blocks.push({
+          date: dayBlock.date,
+          isSelectable: dayBlock.isSelectable,
+          status: dayBlock.status,
+          timeSlots: timeSlots
+        })
+      })
+
+      returnBlocks.push({
+        isNewMonth: weekBlock.isNewMonth,
+        blocks: blocks
+      })
+    })
+
+    return returnBlocks;
+  }
+
+  const onMouseDown = (e: any, indexInWeek: number) => {
+    isDragging.current = true;
+    startPosition.current = parseInt(e.target.getAttribute("data-time-slot"));
+    let currentIndex = parseInt(e.target.getAttribute("data-time-slot"));
+
+    //If the first selected box is empty slot => The current action is selecting the slots
+    isSelecting.current = inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[currentIndex].status === 0;
+
+    let inputBlocksClone = cloneInputBlocks();
+
+    if (isSelecting.current && inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[currentIndex].status !== 2) {
+      inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots = [...inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots];
+      inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[currentIndex] = {
+        status: 2,
+        selectors: inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[currentIndex].selectors
+      }
+    } else if (!isSelecting.current && inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[currentIndex].status !== 0) {
+      inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[currentIndex] = {
+        status: 0,
+        selectors: eliminateMe(inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[currentIndex].selectors)
+      }
+    }
+
+    setInputBlocks(inputBlocksClone);
+    setRenderCalendar(renderCalendar + 1);
+  }
+
+  const onMouseUp = (e: any, indexInWeek: number) => {
+    isDragging.current = false;
+    isSelecting.current = false;
+    startPosition.current = -1;
+
+    let inputBlocksClone = cloneInputBlocks();
+
+    let changed = false;
+    inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots.forEach((slot: any, index: number) => {
+      if (slot.status === 2) {
+        inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[index] = {
+          status: 1,
+          selectors: [...inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[index].selectors, user]
+        }
+        changed = true;
+      }
+    })
+
+    if (changed) {
+      setInputBlocks(inputBlocksClone);
+      setRenderCalendar(renderCalendar + 1);
+    }
+  }
+
+  const onMouseEnter = (e: any, indexInWeek: number) => {
+    mouseEnterNew.current = true;
+    let index = parseInt(e.target.getAttribute("data-time-slot"));
+    setShowingSelectors(inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[index].selectors);
+  }
+
+  const onMouseOut = (e: any, indexInWeek: number) => {
+    mouseEnterNew.current = false;
+    setTimeout(() => {
+      if (!mouseEnterNew.current) {
+        setShowingSelectors([]);
+        mouseEnterNew.current = false;
+      }
+    }, 500);
+  }
+
+  const onMouseMove = (e: any, indexInWeek: number) => {
+    if (isDragging.current) {
+      let currentPosition = parseInt(e.target.getAttribute("data-time-slot"));
+      if (currentPosition) {
+        let inputBlocksClone = cloneInputBlocks();
+
+        let changed = false;
+
+        if (currentPosition >= startPosition.current) {
+          for (let i = startPosition.current; i <= currentPosition; i++) {
+            if (isSelecting.current && inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[i].status !== 2) {
+              inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[i] = {
+                status: 2,
+                selectors: inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[i].selectors
+              }
+              changed = true;
+            } else if (!isSelecting.current && inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[i].status !== 0) {
+              inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[i] = {
+                status: 0,
+                selectors: eliminateMe(inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[i].selectors)
+              }
+              changed = true;
+            }
+          }
+        } else {
+          for (let i = currentPosition; i <= startPosition.current; i++) {
+            if (isSelecting.current && inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[i].status !== 2) {
+              inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[i] = {
+                status: 2,
+                selectors: inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[i].selectors
+              }
+              changed = true;
+            } else if (!isSelecting.current && inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[i].status !== 0) {
+              inputBlocksClone[showingWeek].blocks[indexInWeek].timeSlots[i] = {
+                status: 0,
+                selectors: eliminateMe(inputBlocks[showingWeek].blocks[indexInWeek].timeSlots[i].selectors)
+              }
+              changed = true;
+            }
+          }
+        }
+
+        if (changed) {
+          setInputBlocks(inputBlocksClone);
+          setRenderCalendar(renderCalendar + 1);
+        }
+      }
+    }
+  }
+
+  const updateMeetingInformation = () => {
+    setMeetingID(paramMeetingID);
+    setMeetingPassword(meetingInfo?.password || "");
+
+    setMeetingTitle(meetingInfo?.title || "");
+    setLocation(meetingInfo?.location || "");
+    setDescription(meetingInfo?.description || "");
+    setFromDate(new Date(meetingInfo?.date?.[0] || 0));
+    setToDate(new Date(meetingInfo?.date?.[1] || 0));
+    setBackupFromDate(new Date(meetingInfo?.date?.[0] || 0));
+    setBackupToDate(new Date(meetingInfo?.date?.[1] || 0));
+    setCreator(meetingInfo?.creator || {});
+
+    setIsBonding(meetingInfo?.isBonding || false);
+
+    //Create inputBlocks
+    let blocksStored = meetingInfo?.dateBlocks;
+    let cloneBlocks = [] as any;
+    let modifiedInputBlocks = [] as any;
+    blocksStored.forEach((block: any) => {
+      let getDate = new Date(block.date);
+      getDate.setHours(0);
+      getDate.setMinutes(0);
+      getDate.setSeconds(0);
+
+      let cloneTimeSlots = [];
+      block.timeSlots.forEach((timeSlot: any) => {
+        cloneTimeSlots.push({
+          status: timeSlot.selectors.some((selector: any) => selector.firebase_id === user.firebase_id) ? 1 : 0,
+          selectors: timeSlot.selectors
+        })
+      })
+
+      cloneBlocks.push({
+        date: getDate,
+        isSelectable: block.isSelectable,
+        status: block.status,
+        timeSlots: cloneTimeSlots
+      });
+    })
+    for (let i = 0; i < cloneBlocks.length; i += 7) {
+      let getBlocks = cloneBlocks.slice(i, i + 7);
+      modifiedInputBlocks.push({
+        isNewMonth: getBlocks[0].date.getMonth() !== getBlocks[6].date.getMonth() || getBlocks[0].date.getDate() === 1,
+        blocks: getBlocks,
+      })
+    }
+    setInputBlocks(modifiedInputBlocks);
+
+    setPollOptions(meetingInfo?.poll);
+    setLetUserAdd(meetingInfo?.pollLetUserAdd);
+    setChoiceLimit(meetingInfo?.pollChoicesLimit);
+    setIsLimitChoices(meetingInfo?.pollIsLimitChoice);
+    let selected = 0;
+    meetingInfo?.poll.forEach((option: any) => {
+      option.selectors.forEach((selector: any) => {
+        if (selector.firebase_id === user?.firebase_id)
+          selected++;
+      })
+    })
+    setCountSelected(selected);
+    setSelectedInvitators(meetingInfo?.invitators);
+    setIsPublic(meetingInfo?.isPublic)
+
+    setUpdate(update + 1);
+  }
+
+  const handleSelect = (index: number) => {
+    let pollOptionsClone = [...pollOptions] as any;
+    let participantIndex = -1;
+
+    pollOptionsClone?.[index]?.selectors?.forEach((selector: any, selectorIndex: number) => {
+      if (selector.firebase_id === user?.firebase_id) {
+        participantIndex = selectorIndex;
+      }
+    })
+
+    if (participantIndex > -1) {
+      //Case unselect a choice
+      let updatedSelectors = [];
+
+      for (let i = 0; i < pollOptionsClone?.[index]?.selectors.length; i++) {
+        if (i !== participantIndex) {
+          updatedSelectors.push(pollOptionsClone?.[index]?.selectors[i]);
+        }
+      }
+
+      pollOptionsClone[index] = {
+        description: pollOptionsClone[index].description,
+        link: pollOptionsClone[index].link,
+        location: pollOptionsClone[index].location,
+        type: pollOptionsClone[index].type,
+        title: pollOptionsClone[index].title,
+        selectors: updatedSelectors
+      }
+      pollOptionsClone[index].selectors = updatedSelectors;
+      setCountSelected(countSelected - 1);
+    } else {
+      let updatedSelectors = [];
+
+      for (let i = 0; i < pollOptionsClone?.[index]?.selectors.length; i++) {
+        updatedSelectors.push(pollOptionsClone?.[index]?.selectors[i]);
+      }
+
+      updatedSelectors.push(user);
+
+      pollOptionsClone[index] = {
+        description: pollOptionsClone[index].description,
+        link: pollOptionsClone[index].link,
+        location: pollOptionsClone[index].location,
+        type: pollOptionsClone[index].type,
+        title: pollOptionsClone[index].title,
+        selectors: updatedSelectors
+      }
+
+      setCountSelected(countSelected + 1);
+    }
+
+    setPollOptions(pollOptionsClone);
   }
 
   return (
@@ -357,13 +829,14 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
         </span>
 
         <p className="edit-meeting__hosted-title">
-          host by {user?.name || user?.email}
+          host by {creator?.name || creator?.email}
         </p>
 
         <textarea
           className="edit-meeting__description"
           placeholder="desc..."
           rows={2}
+          value={description}
           onChange={(e: any) => setDescription(e.target.value)}>
           {description}
         </textarea>
@@ -372,7 +845,10 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
           <DatePicker
             dateFormat="dd/MM/yyyy"
             selected={fromDate}
-            onChange={(date: any) => setFromDate(date)}
+            onChange={(date: any) => {
+              setFromDate(date);
+              setChangedDate(true);
+            }}
             minDate={new Date()}
           />
 
@@ -381,7 +857,10 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
           <DatePicker
             dateFormat="dd/MM/yyyy"
             selected={toDate}
-            onChange={(date: any) => setToDate(date)}
+            onChange={(date: any) => {
+              setToDate(date);
+              setChangedDate(true);
+            }}
             minDate={fromDate}
           />
         </div>
@@ -391,7 +870,8 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
             type="text"
             value={location}
             onChange={(e: any) => setLocation(e.target.value)}
-            placeholder="location"></input>
+            placeholder="location"
+            readOnly={true}></input>
         </div>
 
       </div>}
@@ -402,7 +882,7 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
 
         <p className="edit-meeting__hosted-title">
           <label className="switch" style={{ marginRight: "5px" }}>
-            <input type="checkbox"></input>
+            <input type="checkbox" checked={isBonding}></input>
             <span className="slider round" onClick={() => setIsBonding(!isBonding)}></span>
           </label>
           {` `}
@@ -410,7 +890,7 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
             style={{ color: "var(--theme-green)", marginRight: "4px" }}
           >bonding</span> : "meeting "}
 
-          host by {user?.name || user?.email}
+          host by {creator?.name || creator?.email}
         </p>
 
         <div className="edit-meeting__calendar">
@@ -446,41 +926,166 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
         </div>
       </div>}
 
-      {currentPage === 2 && <div className="edit-meeting__action-polling">
+      {currentPage === 2 && <div className="create-meeting__time-pick">
+        <h1 className="create-meeting__title">{meetingTitle !== "" ? meetingTitle : "Meeting"}
+        </h1>
+
+        <div className="create-meeting__time__week-time">
+          <FontAwesomeIcon
+            icon={faArrowLeft}
+            onClick={() => {
+              if (showingWeek > 0)
+                setShowingWeek(showingWeek - 1);
+            }}
+            style={{
+              opacity: showingWeek === 0 ? "0" : "1",
+              cursor: "pointer"
+            }}
+          ></FontAwesomeIcon>
+
+          <div className="create-meeting__time__week-main">
+            <React.Fragment>
+              {
+                <p className="create-meeting__time__month-name">
+                  {getMonthNameFromIndex(inputBlocks[showingWeek].blocks[6].date.getMonth())}
+                </p>
+              }
+
+              <div className="create-meeting__time__week">
+                <div className="create-meeting__left-ruler">
+                  {[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24].map(number => {
+                    return <p style={{ marginBottom: "0" }}>{number}:00</p>
+                  })}
+                </div>
+
+                {inputBlocks[showingWeek].blocks.map((block: any, indexInWeek: number) => {
+                  return (
+                    <div className="create-meeting__week-day-time">
+                      <div
+                        className={`create-meeting__time__week-day
+                        ${!block.isSelectable ? "create-meeting__time__week-day--disabled" : ""}
+                        ${block.isSelectable && block.status === 0 ? "create-meeting__time__week-day--busy" : ""}`}
+                      >
+                        <h4>{block.date.getDate()}</h4>
+                      </div>
+                      <div className={`create-meeting__time__time-range
+                        ${!block.isSelectable ? "create-meeting__time__time-range--disabled" : ""}
+                        ${block.isSelectable && block.status === 0 ? "create-meeting__time__time-range--disabled" : ""}`}>
+                        {block.isSelectable && block.status !== 0 &&
+                          Array.from(Array(32).keys()).map((key: number) => {
+                            return (
+                              <div
+                                className={`create-meeting__time__time-range--time-slot 
+                                  ${key % 2 === 1 && key !== 31 ? "create-meeting__time__time-range--time-slot--divider" : ""}`}
+                                onMouseDown={(e: any) => { onMouseDown(e, indexInWeek) }}
+                                onMouseUp={(e: any) => { onMouseUp(e, indexInWeek) }}
+                                onMouseMove={(e: any) => { onMouseMove(e, indexInWeek) }}
+                                onMouseEnter={(e: any) => { onMouseEnter(e, indexInWeek) }}
+                                onMouseOut={(e: any) => { onMouseOut(e, indexInWeek) }}
+                                style={{
+                                  background: block.timeSlots?.[key].status === 2 ? "#446784" :
+                                    block.timeSlots?.[key].status === 1 ? "#BCCC9A" :
+                                      block.timeSlots?.[key].selectors?.length === 0 ? "none" : "rgba(188, 204, 154, 0.41)"
+                                }}
+                                draggable="false"
+                              >
+                                <span
+                                  className="create-meeting__tooltip-span"
+                                  data-tip
+                                  data-for={`tooltip-${indexInWeek}-${key}`}
+                                  style={{ cursor: 'pointer' }}
+                                  data-time-slot={key}
+                                  draggable="false"
+                                ></span>
+                                <ReactTooltip id={`tooltip-${indexInWeek}-${key}`} place="right" effect="solid">
+                                  <p
+                                    className="no-select"
+                                  >{getTimeText(key)}</p>
+                                </ReactTooltip>
+                              </div>
+                            )
+                          })}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </React.Fragment>
+          </div>
+
+          <FontAwesomeIcon
+            icon={faArrowRight}
+            onClick={() => {
+              if (showingWeek < inputBlocks.length - 1)
+                setShowingWeek(showingWeek + 1);
+            }}
+            style={{
+              opacity: showingWeek === inputBlocks.length - 1 ? "0" : "1",
+              cursor: "pointer"
+            }}
+          ></FontAwesomeIcon>
+        </div>
+
+        {showingSelectors.length > 0 && <div className="create-meeting__selectors">
+          <h5 className="create-meeting__selectors--count">{showingSelectors.length}/{meetingInfo?.invitators.length}</h5>
+          <div className="create-meeting__selectors--container">
+            {showingSelectors.map((selector: any) => {
+              return (
+                <div className="create-meeting__selectors--single">
+                  <img src={selector.image}></img>
+                  <p style={{ margin: 0 }}>{selector.name}</p>
+                </div>
+              )
+            })}
+          </div>
+        </div>}
+      </div>}
+
+      {currentPage === 3 && <div className="edit-meeting__action-polling">
         <h1 className="edit-meeting__title">{meetingTitle !== "" ? meetingTitle : "Meeting"}
         </h1>
 
+        {isLimitChoices && <p className="edit-meeting__choice-limit">
+          {`${choiceLimit - countSelected} / ${choiceLimit} ${choiceLimit - countSelected === 1 ? "choice" : "choices"} left`}</p>}
+
         <div className="edit-meeting__action-polling__options">
-          {pollOptions.map((poll: any) => {
+          {pollOptions.map((poll: any, index: any) => {
             return <div className="edit-meeting__action-polling__options--single">
-              <PollingChoiceCard
+              <PollingChoiceSelectableCard
+                choiceID={index}
                 title={poll.title}
                 location={poll.location}
                 link={poll.link}
                 description={poll.description}
                 type={poll.type}
-              ></PollingChoiceCard>
+                selectors={poll.selectors}
+                isSelected={poll.selectors?.some((selector: any) => selector.firebase_id === user?.firebase_id)}
+                setSelected={() => handleSelect(index)}
+                isSelectable={!isLimitChoices || (isLimitChoices && (countSelected !== choiceLimit))}
+                isEditable={true}
+                editAction={editAction}
+              ></PollingChoiceSelectableCard>
             </div>
           })}
-          <div className="edit-meeting__action-polling__options--single">
-            <PollingChoiceCard
+          {<div className="edit-meeting__action-polling__options--single">
+            <PollingChoiceSelectableCard
               isAddCard={true}
               addAction={addAction}
-            ></PollingChoiceCard>
-          </div>
+            ></PollingChoiceSelectableCard>
+          </div>}
         </div>
 
-        <div className="edit-meeting__action-polling__settings">
-          <div className="edit-meeting__action-polling__settings--option">
+        <div className="create-meeting__action-polling__settings">
+          <div className="create-meeting__action-polling__settings--option">
             <input type="checkbox"
               checked={letUserAdd}
-              onChange={(e: any) => { setLetUserAdd(e.checked) }} />
+              onChange={(e: any) => { setLetUserAdd(e.target.checked) }} />
             <p>let they add</p>
           </div>
-          <div className="edit-meeting__action-polling__settings--option">
+          <div className="create-meeting__action-polling__settings--option">
             <input type="checkbox"
               checked={isLimitChoices}
-              onChange={(e: any) => { setIsLimitChoices(e.checked) }} />
+              onChange={(e: any) => { setIsLimitChoices(e.target.checked) }} />
             <span>
               <p style={{ display: "inline-flex", marginRight: 5 }}>limit to</p>
               <input
@@ -503,14 +1108,17 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
         </div>
       </div>}
 
-      {currentPage === 3 && <div className="edit-meeting__confirmation">
-        <h1 className="edit-meeting__title">{meetingTitle !== "" ? meetingTitle : "Meeting"}
+      {currentPage === 4 && <div className="create-meeting__confirmation">
+        <h1 className="create-meeting__title">{meetingTitle !== "" ? meetingTitle : "Meeting"}
         </h1>
 
         <span>
           <label className="switch" style={{ marginRight: "5px" }}>
-            <input type="checkbox"></input>
-            <span className="slider round" onClick={() => setIsPublic(!isPublic)}></span>
+            <input type="checkbox" checked={isPublic}></input>
+            <span className="slider round" onClick={() => {
+              dispatch(updateMeetingPublic({ isPublic: !isPublic }))
+              setIsPublic(!isPublic);
+            }}></span>
           </label>
           {` `}
           {isPublic ? <span
@@ -520,14 +1128,15 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
 
         {/* Private mode */}
         {!isPublic && <SearchBar
+          selected={selectedInvitators}
           setSelected={setSelectedInvitators}
         ></SearchBar>}
 
         {/* Public mode */}
-        {isPublic && <div className="edit-meeting__confirmation--public">
-          <div className="edit-meeting__public-link">
+        {isPublic && <div className="create-meeting__confirmation--public">
+          <div className="create-meeting__public-link">
             <FontAwesomeIcon icon={faLink}></FontAwesomeIcon>
-            <p className="edit-meeting__public-link--link" style={{ margin: 0 }}
+            <p className="create-meeting__public-link--link" style={{ margin: 0 }}
               onClick={() => {
                 navigator.clipboard.writeText(`${window.location.origin}/meeting/${meetingID}`);
                 toast("Copied to clipboard", {
@@ -545,13 +1154,13 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
             <FontAwesomeIcon icon={faCopy}></FontAwesomeIcon>
           </div>
 
-          <div className="edit-meeting__public-link"
+          <div className="create-meeting__public-link"
             style={{
               display: "flex",
               marginTop: 5
             }}>
             <FontAwesomeIcon icon={faKey}></FontAwesomeIcon>
-            <p className="edit-meeting__public-link--link"
+            <p className="create-meeting__public-link--link"
               style={{
                 margin: 0,
                 textDecorationColor: "underline"
@@ -568,7 +1177,7 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
                   progress: undefined,
                 })
               }}>
-              {meetingPassword}
+              {decrypt(meetingPassword)}
             </p>
             <FontAwesomeIcon icon={faCopy}></FontAwesomeIcon>
           </div>
@@ -589,7 +1198,7 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
         </button>}
 
         {(currentPage === numberOfPages - 1) && <button className="edit-meeting__next" onClick={() => {
-          createMeeting();
+          saveMeeting();
         }}>
           <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
         </button>}

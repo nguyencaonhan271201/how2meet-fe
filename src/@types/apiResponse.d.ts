@@ -24,7 +24,7 @@ interface ICreateUserResponse extends ICreateResponse {
 interface ICreateMeetingResponse extends ICreateResponse {
   title?: string;
   description?: string;
-  creator?: string;
+  creator?: ICreateUserResponse;
   location?: string;
   password?: string;
   date?: Array<Date>;

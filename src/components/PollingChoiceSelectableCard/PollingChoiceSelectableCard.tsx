@@ -4,6 +4,8 @@ import { faMapMarkerAlt, faLink, faUtensils, faGamepad, faPlus } from '@fortawes
 import { faClock } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useHistory } from 'react-router-dom';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 export const PollingChoiceSelectableCard: React.FC<IPollingChoiceSelectableCard> = ({
   meetingID,
@@ -23,6 +25,41 @@ export const PollingChoiceSelectableCard: React.FC<IPollingChoiceSelectableCard>
   editAction,
 }) => {
   const history = useHistory();
+  const MySwal = withReactContent(Swal);
+
+  const reviewSelectors = () => {
+    MySwal.fire({
+      title: 'List of selectors',
+      html: `
+          <div class="text-center colab-details">
+              
+          </div>
+      `,
+      didOpen: () => {
+        let colabList = document.querySelector(".colab-details");
+        let listHTML = ``;
+        selectors.forEach((selector: any) => {
+          listHTML += `
+                  <div class="colab-result">
+                      <div class="row">
+                          <div class="col-md-4 col-sm-6 offset-md-0 offset-sm-3">
+                              <img src="${selector.image}" alt="" class="des-result-img">
+                          </div>
+                          <div class="col-md-8 col-sm-12 d-flex align-items-center justify-content-center justify-content-md-start">
+                              <div class="text-md-left text-center">
+                                  <h5 class="text-pink">${selector.name}</h5>
+                                  <p class="text-gray">${selector.email}</p>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              `
+        })
+        colabList.innerHTML = listHTML;
+      },
+      allowOutsideClick: () => !Swal.isLoading()
+    })
+  }
 
   return (
     <>
@@ -33,13 +70,16 @@ export const PollingChoiceSelectableCard: React.FC<IPollingChoiceSelectableCard>
       {!isAddCard && <div className={`polling-choice-selectable-card 
       ${isSelected ? "polling-choice-selectable-card--selected" : ""}
       ${(!isSelected && !isSelectable) ? "polling-choice-selectable-card--not-selectable" : ""}`}
-        onClick={() => {
-          if (!isSelected) {
-            if (isSelectable) {
+        onClick={(e: any) => {
+          if (!e.target.classList.contains("polling-choice-selectable-card__participants")
+            && !e.target.classList.contains("polling-choice-selectable-card__participant")) {
+            if (!isSelected) {
+              if (isSelectable) {
+                setSelected();
+              }
+            } else {
               setSelected();
             }
-          } else {
-            setSelected();
           }
         }}
         onContextMenu={(e: any) => {
@@ -74,7 +114,7 @@ export const PollingChoiceSelectableCard: React.FC<IPollingChoiceSelectableCard>
           <FontAwesomeIcon icon={type === 0 ? faUtensils : faGamepad}></FontAwesomeIcon>
         </div>
 
-        {selectors?.length > 0 && <div className="polling-choice-selectable-card__participants">
+        {selectors?.length > 0 && <div className="polling-choice-selectable-card__participants" onClick={() => reviewSelectors()}>
           {selectors?.map((participant, index) => (
             <img
               className="polling-choice-selectable-card__participant"

@@ -62,6 +62,6 @@ interface IPollingChoiceSelectableCard extends IPollingChoiceCard {
 
 interface ISearchBar {
   value?: string,
-  selected?: Array<any>,
+  selected?: Array<ICreateUserResponse>,
   setSelected?: any
 }
