@@ -4,10 +4,12 @@ import { Footer } from '../../components/Footer/Footer';
 import { MeetingCard } from '../../components/MeetingCard/MeetingCard';
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { doGetMeetings, doGetUserByFirebaseID, RootState, useAppDispatch } from '../../redux';
 import { useSelector } from 'react-redux';
 import { getCurrentDateFullString } from '../../helpers/date';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
   document.title = "How2Meet? | Meetings";
@@ -18,6 +20,9 @@ export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
 
   const history = useHistory();
   const dispatch = useAppDispatch();
+  const location = useLocation() as any;
+  const MySwal = withReactContent(Swal);
+
   const { user } = useSelector(
     (state: RootState) => state.loginSlice,
   );
@@ -31,6 +36,14 @@ export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
       dispatch(doGetUserByFirebaseID({
         firebase_id: localStorage.getItem('firebase_id') || ''
       }))
+
+    if (location?.state?.isNotValidMeeting) {
+      MySwal.fire({
+        icon: 'error',
+        title: 'Permission denied...',
+        text: 'You are not allowed to access this meeting!!!',
+      })
+    }
   }, []);
 
   useEffect(() => {
@@ -77,7 +90,8 @@ export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
           <div className="meetings__list">
             {currentList.map((meeting: any) => (
               <MeetingCard
-                meetingID={meeting._id}
+                isHost={meeting.creator.firebase_id === user?.firebase_id}
+                meetingID={meeting.meetingID}
                 isCurrent={false}
                 type={meeting.isBonding ? 1 : 0}
                 title={meeting.title}
@@ -98,7 +112,8 @@ export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
           <div className="meetings__list">
             {archivedList.map(meeting => (
               <MeetingCard
-                meetingID={meeting._id}
+                isHost={meeting.creator.firebase_id === user?.firebase_id}
+                meetingID={meeting.meetingID}
                 isCurrent={false}
                 type={meeting.isBonding ? 1 : 0}
                 title={meeting.title}

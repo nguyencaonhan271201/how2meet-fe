@@ -40,7 +40,16 @@ export const RegisterPage: React.FC<ILoginPage> = ({ }) => {
     setPasswordError("");
     setConfirmPasswordError("");
 
-    MySwal.showLoading();
+    MySwal.fire({
+      didOpen: () => {
+        MySwal.showLoading();
+      },
+      didClose: () => {
+        MySwal.hideLoading();
+      },
+      allowOutsideClick: false,
+    })
+
 
     if (!validateEmail(email)) {
       setEmailError("invalid");
@@ -185,7 +194,14 @@ export const RegisterPage: React.FC<ILoginPage> = ({ }) => {
 
       localStorage.setItem('firebase_id', user.uid);
       localStorage.setItem("firebaseLoggedIn", "1");
-      history.push("/meetings");
+
+      if (!localStorage.getItem("pendingMeetingID")) {
+        history.push('/meetings');
+      } else {
+        let meetingID = localStorage.getItem("pendingMeetingID");
+        localStorage.removeItem("pendingMeetingID");
+        history.push(`/meeting/${meetingID}`, { isFromMissingLogin: true });
+      }
 
     } catch (err: any) {
       MySwal.fire({

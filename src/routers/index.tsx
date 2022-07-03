@@ -19,6 +19,7 @@ import { CreateMeeting } from '../containers/CreateMeeting/CreateMeeting';
 import { MeetingMinute } from '../containers/MeetingMinute/MeetingMinute';
 import { MeetingImageUpload } from '../containers/MeetingImageUpload/MeetingImageUpload';
 import { EditAccount } from '../containers/EditAccount/EditAccount';
+import { MeetingPage } from '../containers/MeetingPage/MeetingPage';
 
 export const Routers = () => {
   return (
@@ -80,6 +81,15 @@ export const Routers = () => {
           exact={true}
           path={'/meeting-image/:id'}
           component={MeetingImageUpload}
+          layout={OnlyFooterLayout}
+          footer={Footer}
+          isHasFooter={true}
+        />
+
+        <PublicRouter
+          exact={true}
+          path={'/meeting/:id'}
+          component={MeetingPage}
           layout={OnlyFooterLayout}
           footer={Footer}
           isHasFooter={true}

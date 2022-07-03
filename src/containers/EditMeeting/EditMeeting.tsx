@@ -16,10 +16,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { doCreateMeeting, doGetUserByFirebaseID, resetMeetingCreationStatus, RootState, useAppDispatch } from '../../redux';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { encrypt } from '../../helpers/password';
 
-export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
-  document.title = "How2Meet? | New Meeting";
+export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
+  document.title = "How2Meet? | Edit Meeting";
   const { user } = useSelector(
     (state: RootState) => state.loginSlice,
   );
@@ -259,137 +258,10 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
             location: location,
             link: link,
             description: description,
-            type: parseInt(type),
-            selectors: [],
-            creator: user?.firebase_id
+            type: parseInt(type)
           }
 
           let clonePollOptions = [...pollOptions, thisOption];
-          setPollOptions(clonePollOptions);
-        } else {
-          MySwal.showValidationMessage(
-            errorText
-          )
-        }
-      },
-      allowOutsideClick: () => !MySwal.isLoading()
-    })
-  }
-
-  const deleteAction = (index: number) => {
-    MySwal.fire({
-      title: "Are you sure want to remove this option?",
-      text: "All votes for this option will be deleted",
-      icon: "warning",
-      cancelButtonText: "No",
-      confirmButtonText: "Yes",
-      showCancelButton: true,
-      showConfirmButton: true
-    })
-      .then((willDelete) => {
-        if (willDelete.isConfirmed) {
-          let clonePollOptions = [...pollOptions];
-          clonePollOptions.splice(index, 1);
-          setPollOptions(clonePollOptions);
-        }
-      });
-  }
-
-  const editAction = (index: number) => {
-    MySwal.fire({
-      title: 'Edit an option',
-      html: `
-          <div>
-            <label for="title" class="mr-2 mt-2 swal-label">title</label>
-            <input class="swal2-input" placeholder="title" type="text" id="title"><br>
-          </div>
-
-          <div>
-            <label for="location" class="mr-2 mt-2 swal-label">location</label>
-            <input class="swal2-input" placeholder="location" type="text" id="location"><br>
-          </div>
-
-          <div>
-            <label for="link" class="mr-2 mt-2 swal-label">link</label>
-            <input class="swal2-input" placeholder="link" type="text" id="link"><br>
-          </div>
-
-          <div>
-            <label for="description" class="mr-2 mt-2 swal-label">description</label>
-            <textarea class="swal2-input" placeholder="description" id="description"></textarea>
-          </div>
-
-          <div>
-            <label for="type" class="mr-2 mt-2 swal-label">type</label>
-            <select class="swal2-input" id="type">
-              <option value="0" selected>Dining</option>
-              <option value="1">Activities</option>
-            </select>
-          </div>
-
-          <div>
-            <button 
-            id="deleteAction"
-            type="button" class="swal2-cancel swal2-styled swal2-default-outline" style="display: inline-block; background-color: red;" aria-label="">
-            Delete</button>
-          </div>
-        `,
-      showCancelButton: true,
-      confirmButtonText: 'Edit',
-      confirmButtonColor: 'green',
-      cancelButtonColor: 'red',
-      showLoaderOnConfirm: true,
-      didOpen: () => {
-        let getAction = pollOptions[index];
-
-        (document?.getElementById('title') as HTMLInputElement).value = getAction.title;
-        (document?.getElementById('location') as HTMLInputElement).value = getAction.location;
-        (document?.getElementById('link') as HTMLInputElement).value = getAction.link;
-        (document?.getElementById('description') as HTMLInputElement).value = getAction.description;
-        (document?.getElementById('type') as HTMLInputElement).value = getAction.type;
-
-        (document?.getElementById('deleteAction') as HTMLButtonElement).addEventListener('click', () => {
-          deleteAction(index);
-        })
-      },
-      preConfirm: () => {
-        let title = (document?.getElementById('title') as HTMLInputElement).value || "";
-        let location = (document?.getElementById('location') as HTMLInputElement).value || "";
-        let link = (document?.getElementById('link') as HTMLInputElement).value || "";
-        let description = (document?.getElementById('description') as HTMLTextAreaElement).value || "";
-        let type = (document?.getElementById('type') as HTMLSelectElement).value || "0";
-
-        let errorText = "";
-        if (title === "") {
-          if (errorText !== "")
-            errorText += '<br>'
-          errorText += `please input the title.`
-        }
-
-        if (location === "") {
-          if (errorText !== "")
-            errorText += '<br>'
-          errorText += `please input the location.`
-        }
-
-        if (description === "") {
-          if (errorText !== "")
-            errorText += '<br>'
-          errorText += `please input the description.`
-        }
-
-        if (errorText === "") {
-          let thisOption = {
-            title: title,
-            location: location,
-            link: link,
-            description: description,
-            type: parseInt(type),
-            selectors: []
-          }
-
-          let clonePollOptions = [...pollOptions];
-          clonePollOptions[index] = thisOption;
           setPollOptions(clonePollOptions);
         } else {
           MySwal.showValidationMessage(
@@ -432,7 +304,7 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
     let meetingObject = {
       title: meetingTitle.toUpperCase(),
       description: description,
-      password: encrypt(meetingPassword),
+      password: meetingPassword,
       location: location,
       creator: user,
       date: [fromDate, toDate],
@@ -456,14 +328,14 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
   }
 
   return (
-    <div className="create-meeting">
-      {currentPage === 0 && <div className="create-meeting__general-info">
+    <div className="edit-meeting">
+      {currentPage === 0 && <div className="edit-meeting__general-info">
         <span>
-          <h1 className="create-meeting__title">EVENT
+          <h1 className="edit-meeting__title">EVENT
 
           </h1>
           <span
-            className="create-meeting__name"
+            className="edit-meeting__name"
             style={{
               position: "relative",
             }}>
@@ -484,19 +356,19 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
           </span>
         </span>
 
-        <p className="create-meeting__hosted-title">
+        <p className="edit-meeting__hosted-title">
           host by {user?.name || user?.email}
         </p>
 
         <textarea
-          className="create-meeting__description"
+          className="edit-meeting__description"
           placeholder="desc..."
           rows={2}
           onChange={(e: any) => setDescription(e.target.value)}>
           {description}
         </textarea>
 
-        <div className="create-meeting__dates">
+        <div className="edit-meeting__dates">
           <DatePicker
             dateFormat="dd/MM/yyyy"
             selected={fromDate}
@@ -504,7 +376,7 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
             minDate={new Date()}
           />
 
-          <span className="create-meeting__to">to</span>
+          <span className="edit-meeting__to">to</span>
 
           <DatePicker
             dateFormat="dd/MM/yyyy"
@@ -514,7 +386,7 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
           />
         </div>
 
-        <div className="create-meeting__location-input">
+        <div className="edit-meeting__location-input">
           <input
             type="text"
             value={location}
@@ -524,11 +396,11 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
 
       </div>}
 
-      {currentPage === 1 && <div className="create-meeting__date-pick">
-        <h1 className="create-meeting__title">{meetingTitle !== "" ? meetingTitle : "Meeting"}
+      {currentPage === 1 && <div className="edit-meeting__date-pick">
+        <h1 className="edit-meeting__title">{meetingTitle !== "" ? meetingTitle : "Meeting"}
         </h1>
 
-        <p className="create-meeting__hosted-title">
+        <p className="edit-meeting__hosted-title">
           <label className="switch" style={{ marginRight: "5px" }}>
             <input type="checkbox"></input>
             <span className="slider round" onClick={() => setIsBonding(!isBonding)}></span>
@@ -541,22 +413,22 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
           host by {user?.name || user?.email}
         </p>
 
-        <div className="create-meeting__calendar">
+        <div className="edit-meeting__calendar">
           {inputBlocks.map((week: any, index: number) => {
             return (
               <>
                 {(index === 0 || week.isNewMonth) &&
-                  <p className="create-meeting__calendar__month-name">
+                  <p className="edit-meeting__calendar__month-name">
                     {getMonthNameFromIndex(week.blocks[6].date.getMonth())}
                   </p>}
 
-                <div className="create-meeting__calendar__week">
+                <div className="edit-meeting__calendar__week">
                   {week.blocks.map((block: any, indexInWeek: number) => {
                     return (
                       <div
-                        className={`no-select create-meeting__calendar__week-day
-                        ${!block.isSelectable ? "create-meeting__calendar__week-day--disabled" : ""}
-                        ${block.isSelectable && block.status === 0 ? "create-meeting__calendar__week-day--busy" : ""}`}
+                        className={`no-select edit-meeting__calendar__week-day
+                        ${!block.isSelectable ? "edit-meeting__calendar__week-day--disabled" : ""}
+                        ${block.isSelectable && block.status === 0 ? "edit-meeting__calendar__week-day--busy" : ""}`}
                         onClick={() => {
                           if (block.isSelectable) {
                             updateStatus(index, indexInWeek)
@@ -574,25 +446,23 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
         </div>
       </div>}
 
-      {currentPage === 2 && <div className="create-meeting__action-polling">
-        <h1 className="create-meeting__title">{meetingTitle !== "" ? meetingTitle : "Meeting"}
+      {currentPage === 2 && <div className="edit-meeting__action-polling">
+        <h1 className="edit-meeting__title">{meetingTitle !== "" ? meetingTitle : "Meeting"}
         </h1>
 
-        <div className="create-meeting__action-polling__options">
-          {pollOptions.map((poll: any, index: number) => {
-            return <div className="create-meeting__action-polling__options--single">
+        <div className="edit-meeting__action-polling__options">
+          {pollOptions.map((poll: any) => {
+            return <div className="edit-meeting__action-polling__options--single">
               <PollingChoiceCard
-                choiceID={index}
                 title={poll.title}
                 location={poll.location}
                 link={poll.link}
                 description={poll.description}
                 type={poll.type}
-                editAction={editAction}
               ></PollingChoiceCard>
             </div>
           })}
-          <div className="create-meeting__action-polling__options--single">
+          <div className="edit-meeting__action-polling__options--single">
             <PollingChoiceCard
               isAddCard={true}
               addAction={addAction}
@@ -600,17 +470,17 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
           </div>
         </div>
 
-        <div className="create-meeting__action-polling__settings">
-          <div className="create-meeting__action-polling__settings--option">
+        <div className="edit-meeting__action-polling__settings">
+          <div className="edit-meeting__action-polling__settings--option">
             <input type="checkbox"
               checked={letUserAdd}
-              onChange={(e: any) => { setLetUserAdd(e.target.checked) }} />
+              onChange={(e: any) => { setLetUserAdd(e.checked) }} />
             <p>let they add</p>
           </div>
-          <div className="create-meeting__action-polling__settings--option">
+          <div className="edit-meeting__action-polling__settings--option">
             <input type="checkbox"
               checked={isLimitChoices}
-              onChange={(e: any) => { setIsLimitChoices(e.target.checked) }} />
+              onChange={(e: any) => { setIsLimitChoices(e.checked) }} />
             <span>
               <p style={{ display: "inline-flex", marginRight: 5 }}>limit to</p>
               <input
@@ -633,8 +503,8 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
         </div>
       </div>}
 
-      {currentPage === 3 && <div className="create-meeting__confirmation">
-        <h1 className="create-meeting__title">{meetingTitle !== "" ? meetingTitle : "Meeting"}
+      {currentPage === 3 && <div className="edit-meeting__confirmation">
+        <h1 className="edit-meeting__title">{meetingTitle !== "" ? meetingTitle : "Meeting"}
         </h1>
 
         <span>
@@ -654,10 +524,10 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
         ></SearchBar>}
 
         {/* Public mode */}
-        {isPublic && <div className="create-meeting__confirmation--public">
-          <div className="create-meeting__public-link">
+        {isPublic && <div className="edit-meeting__confirmation--public">
+          <div className="edit-meeting__public-link">
             <FontAwesomeIcon icon={faLink}></FontAwesomeIcon>
-            <p className="create-meeting__public-link--link" style={{ margin: 0 }}
+            <p className="edit-meeting__public-link--link" style={{ margin: 0 }}
               onClick={() => {
                 navigator.clipboard.writeText(`${window.location.origin}/meeting/${meetingID}`);
                 toast("Copied to clipboard", {
@@ -675,13 +545,13 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
             <FontAwesomeIcon icon={faCopy}></FontAwesomeIcon>
           </div>
 
-          <div className="create-meeting__public-link"
+          <div className="edit-meeting__public-link"
             style={{
               display: "flex",
               marginTop: 5
             }}>
             <FontAwesomeIcon icon={faKey}></FontAwesomeIcon>
-            <p className="create-meeting__public-link--link"
+            <p className="edit-meeting__public-link--link"
               style={{
                 margin: 0,
                 textDecorationColor: "underline"
@@ -705,20 +575,20 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
         </div>}
       </div>}
 
-      <div className="create-meeting__controls">
-        {currentPage > 2 && <button className="create-meeting__prev" onClick={() => {
+      <div className="edit-meeting__controls">
+        {currentPage > 2 && <button className="edit-meeting__prev" onClick={() => {
           setCurrentPage(currentPage - 1);
         }}>
           <FontAwesomeIcon icon={faArrowLeft}></FontAwesomeIcon>
         </button>}
 
-        {(currentPage !== numberOfPages - 1) && <button className="create-meeting__next" onClick={() => {
+        {(currentPage !== numberOfPages - 1) && <button className="edit-meeting__next" onClick={() => {
           nextPage();
         }}>
           <FontAwesomeIcon icon={faArrowRight}></FontAwesomeIcon>
         </button>}
 
-        {(currentPage === numberOfPages - 1) && <button className="create-meeting__next" onClick={() => {
+        {(currentPage === numberOfPages - 1) && <button className="edit-meeting__next" onClick={() => {
           createMeeting();
         }}>
           <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>

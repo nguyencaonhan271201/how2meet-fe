@@ -16,6 +16,7 @@ export const PollingChoiceCard: React.FC<IPollingChoiceCard> = ({
   description,
   isAddCard,
   addAction,
+  editAction
 }) => {
   const history = useHistory();
 
@@ -25,7 +26,10 @@ export const PollingChoiceCard: React.FC<IPollingChoiceCard> = ({
         <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
       </div>}
       {!isAddCard && <div className={`polling-choice-card`}
-        onClick={() => { }}>
+        onContextMenu={(e: any) => {
+          e.preventDefault();
+          if (editAction) editAction(choiceID);
+        }}>
         <h3 className="polling-choice-card__title">{title}</h3>
 
         <div className="polling-choice-card__info">
@@ -37,7 +41,7 @@ export const PollingChoiceCard: React.FC<IPollingChoiceCard> = ({
           </div>
           {link !== "" && <div className="polling-choice-card__info--detail">
             <FontAwesomeIcon icon={faLink} />
-            <a href={link} target="_blank" className={`polling-choice-card__info--detail__text`}>
+            <a href={link} target="_blank" className={`polling-choice-selectable-card__info--detail__text`}>
               {link}
             </a>
           </div>}
