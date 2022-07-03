@@ -33,4 +33,19 @@ interface IMeetingSlice {
   meetings?: Array<ICreateMeetingResponse>;
   gettingMeetingsError?: any;
   isGettingMeetings?: boolean;
+
+  meetingByID?: ICreateMeetingResponse;
+  isGettingMeetingByID?: boolean;
+  gettingMeetingByIDError?: any;
+
+  isUpdateMeetingParticipantsProfile?: boolean;
+  updateMeetingParticipantsProfileError?: any;
+
+  isAddInvitatorToMeeting?: boolean;
+  addInvitatorToMeetingError?: any;
+  temporarilySavedUserToAdd?: ICreateUserResponse;
+
+  isUpdateMeeting?: boolean;
+  updateMeetingSuccess?: boolean;
+  updateMeetingError?: any;
 }

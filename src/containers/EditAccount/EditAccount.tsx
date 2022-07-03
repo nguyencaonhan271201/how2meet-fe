@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Input } from '../../components/Input/Input';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { storage } from '../../configs/firebase';
-import { doGetUserByFirebaseID, doUpdateProfile, RootState, useAppDispatch } from '../../redux';
+import { doGetUserByFirebaseID, doUpdateMeetingParticipantsProfile, doUpdateProfile, RootState, useAppDispatch } from '../../redux';
 import { useSelector } from 'react-redux';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
@@ -37,7 +37,7 @@ export const EditAccount: React.FC<IEditAccount> = ({ }) => {
   }, [user]);
 
   useEffect(() => {
-    if (isUpdateProfile && updateProfileSuccess) {
+    if (!isUpdateProfile && updateProfileSuccess) {
       setCalledUpdated(false);
       MySwal.fire({
         icon: 'success',
@@ -154,6 +154,14 @@ export const EditAccount: React.FC<IEditAccount> = ({ }) => {
     //Valid
     setCalledUpdated(true);
     dispatch(doUpdateProfile({
+      firebase_id: user?.firebase_id,
+      email: email,
+      password: "",
+      image: image,
+      name: name
+    }));
+
+    dispatch(doUpdateMeetingParticipantsProfile({
       firebase_id: user?.firebase_id,
       email: email,
       password: "",

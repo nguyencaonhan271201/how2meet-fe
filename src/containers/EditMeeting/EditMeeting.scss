@@ -1,4 +1,4 @@
-.create-meeting {
+.edit-meeting {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -293,7 +293,7 @@
       margin-top: 35px;
       margin-bottom: 10px;
       width: 100%;
-      overflow: auto;
+      overflow: scroll;
       display: flex;
       align-items: center;
       justify-content: flex-end;

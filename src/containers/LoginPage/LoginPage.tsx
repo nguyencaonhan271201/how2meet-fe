@@ -9,7 +9,6 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { validateEmail } from '../../helpers/validate';
-
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { signInWithPopup } from 'firebase/auth';
@@ -40,13 +39,30 @@ export const LoginPage: React.FC<ILoginPage> = ({ }) => {
         text: 'Please log in to continue!',
       })
     }
+
+    if (localStorage.getItem("pendingMeetingID")) {
+      MySwal.fire({
+        icon: 'error',
+        title: 'Error...',
+        text: 'Please log in to access the meeting!',
+      })
+    }
   }, []);
 
   const validateLogin = async () => {
     setEmailError("");
     setPasswordError("");
 
-    MySwal.showLoading();
+    MySwal.fire({
+      didOpen: () => {
+        MySwal.showLoading();
+      },
+      didClose: () => {
+        MySwal.hideLoading();
+      },
+      allowOutsideClick: false,
+    })
+
 
     if (!validateEmail(email)) {
       setEmailError("invalid");
@@ -91,7 +107,14 @@ export const LoginPage: React.FC<ILoginPage> = ({ }) => {
         //Valid login
         localStorage.setItem("firebaseLoggedIn", "1");
         localStorage.setItem('firebase_id', result.user?.uid);
-        history.push("/meetings");
+
+        if (!localStorage.getItem("pendingMeetingID")) {
+          history.push('/meetings');
+        } else {
+          let meetingID = localStorage.getItem("pendingMeetingID");
+          localStorage.removeItem("pendingMeetingID");
+          history.push(`/meeting/${meetingID}`, { isFromMissingLogin: true });
+        }
       })
       .catch((error: any) => {
         MySwal.close();
@@ -148,7 +171,14 @@ export const LoginPage: React.FC<ILoginPage> = ({ }) => {
 
       localStorage.setItem("firebaseLoggedIn", "1");
       localStorage.setItem('firebase_id', user.uid);
-      history.push('/meetings');
+
+      if (!localStorage.getItem("pendingMeetingID")) {
+        history.push('/meetings');
+      } else {
+        let meetingID = localStorage.getItem("pendingMeetingID");
+        localStorage.removeItem("pendingMeetingID");
+        history.push(`/meeting/${meetingID}`, { isFromMissingLogin: true });
+      }
 
     } catch (err: any) {
       MySwal.fire({

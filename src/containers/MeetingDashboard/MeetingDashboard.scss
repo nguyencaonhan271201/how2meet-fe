@@ -17,9 +17,10 @@
 
     &--container {
       height: 75%;
-      overflow: scroll;
+      overflow: auto;
       width: calc(100vw - 80px);
       position: relative;
+      min-height: 30vh;
     }
   }
 

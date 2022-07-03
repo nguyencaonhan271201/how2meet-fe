@@ -12,6 +12,29 @@ export const doGetMeetings = createAsyncThunk('apiMeeting@get/meetings', async (
   return result.data;
 });
 
+export const doGetMeetingByMeetingID = createAsyncThunk('apiMeeting@get/meetingByID', async (param: IAPIGetMeetingByID) => {
+  const result: AxiosResponse = await apiMeeting.getMeetingByID(param);
+  return result.data;
+});
+
+export const doUpdateMeetingParticipantsProfile 
+= createAsyncThunk('apiMeeting@post/updateMeetingParticipantsProfile', async (param: IAPIPostNewUser) => {
+  const result: AxiosResponse = await apiMeeting.updateMeetingParticipantsProfile(param);
+  return result.data;
+});
+
+export const doAddInvitatorToMeeting 
+= createAsyncThunk('apiMeeting@post/addInvitatorToMeeting', async (param: IAPIAddInvitatorToMeeting) => {
+  const result: AxiosResponse = await apiMeeting.addInvitatorToMeeting(param);
+  return result.data;
+});
+
+export const doUpdateMeeting 
+= createAsyncThunk('apiMeeting@post/updateMeeting', async (param: IAPIUpdateMeeting) => {
+  const result: AxiosResponse = await apiMeeting.updateMeeting(param);
+  return result.data;
+});
+
 const initialState = {
   isCreatingNewMeeting: false,
   createNewMeetingSuccess: false,
@@ -19,7 +42,22 @@ const initialState = {
 
   meetings: [],
   isGettingMeetings: false,
-  gettingMeetingsError: {}
+  gettingMeetingsError: {},
+
+  meetingByID: {},
+  isGettingMeetingByID: false,
+  gettingMeetingByIDError: {},
+
+  isUpdateMeetingParticipantsProfile: false,
+  updateMeetingParticipantsProfileError: {},
+
+  isAddInvitatorToMeeting: false,
+  addInvitatorToMeetingError: {},
+  temporarilySavedUserToAdd: {},
+
+  isUpdateMeeting: false,
+  updateMeetingSuccess: false,
+  updateMeetingError: {},
 } as IMeetingSlice;
 
 const slice = createSlice({
@@ -30,10 +68,20 @@ const slice = createSlice({
       state.isCreatingNewMeeting = false;
       state.createNewMeetingSuccess = false;
       state.createNewMeetingError = {};
+    },
+
+    resetMeetingUpdateStatus(state) {
+      state.isUpdateMeeting = false;
+      state.updateMeetingSuccess = false;
+      state.updateMeetingError = {};
+    },
+
+    temporarilySavedUserToAdd(state, action) {
+      state.temporarilySavedUserToAdd = action.payload.user;
     }
   },
   extraReducers: (builder) => {
-    //doPostNewUser
+    //doCreateMeeting
     builder.addCase(doCreateMeeting.pending, (state) => {
       state.isCreatingNewMeeting = true;
       state.createNewMeetingSuccess = false;
@@ -64,9 +112,71 @@ const slice = createSlice({
         error: "Error occured"
       }
     });
+
+    //doGetMeetingByMeetingID
+    builder.addCase(doGetMeetingByMeetingID.pending, (state) => {
+      state.isGettingMeetingByID = true;
+    });
+    builder.addCase(doGetMeetingByMeetingID.fulfilled, (state, action) => {
+      state.meetingByID = action.payload;
+      state.isGettingMeetingByID = false;
+    });
+    builder.addCase(doGetMeetingByMeetingID.rejected, (state, action) => {
+      state.isGettingMeetingByID = false;
+      state.gettingMeetingByIDError = {
+        error: "Error occured"
+      }
+    });
+
+    //doUpdateMeetingParticipantsProfile
+    builder.addCase(doUpdateMeetingParticipantsProfile.pending, (state) => {
+      state.isUpdateMeetingParticipantsProfile = true;
+    });
+    builder.addCase(doUpdateMeetingParticipantsProfile.fulfilled, (state, action) => {
+      state.isUpdateMeetingParticipantsProfile = false;
+    });
+    builder.addCase(doUpdateMeetingParticipantsProfile.rejected, (state, action) => {
+      state.isUpdateMeetingParticipantsProfile = false;
+      state.updateMeetingParticipantsProfileError = {
+        error: "Error occured"
+      }
+    });
+
+    //doUpdateMeetingParticipantsProfile
+    builder.addCase(doAddInvitatorToMeeting.pending, (state) => {
+      state.isAddInvitatorToMeeting = true;
+    });
+    builder.addCase(doAddInvitatorToMeeting.fulfilled, (state, action) => {
+      state.isAddInvitatorToMeeting = false;
+      state.meetingByID.invitators.push(state.temporarilySavedUserToAdd);
+      state.temporarilySavedUserToAdd = {};
+    });
+    builder.addCase(doAddInvitatorToMeeting.rejected, (state, action) => {
+      state.isAddInvitatorToMeeting = false;
+      state.addInvitatorToMeetingError = {
+        error: "Error occured"
+      }
+    });
+
+    //doUpdateMeeting
+    builder.addCase(doUpdateMeeting.pending, (state) => {
+      state.isUpdateMeeting = true;
+      state.updateMeetingSuccess = false;
+    });
+    builder.addCase(doUpdateMeeting.fulfilled, (state, action) => {
+      state.updateMeetingSuccess = true;
+      state.isUpdateMeeting = false;
+    });
+    builder.addCase(doUpdateMeeting.rejected, (state, action) => {
+      state.updateMeetingSuccess = false;
+      state.isUpdateMeeting = true;
+      state.updateMeetingError = {
+        error: "Error occured"
+      }
+    });
   },
 });
 
 const { reducer, actions } = slice;
-export const { resetMeetingCreationStatus } = actions;
+export const { resetMeetingCreationStatus, temporarilySavedUserToAdd } = actions;
 export default reducer;

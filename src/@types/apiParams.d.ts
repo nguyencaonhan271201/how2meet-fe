@@ -28,6 +28,8 @@ interface IAPISearchUserByQuery {
 interface IAPIPostNewMeeting {
   title?: string;
   description?: string;
+  password?: string;
+  location?: string;
   creator?: string;
   date?: Array<Date>;
   isBonding?: boolean;
@@ -43,4 +45,19 @@ interface IAPIPostNewMeeting {
 
 interface IAPIGetMeetings {
   firebase_id?: string;
+}
+
+interface IAPIGetMeetingByID {
+  meetingID?: string;
+}
+
+interface IAPIAddInvitatorToMeeting {
+  meetingID?: string;
+  invitator?: IAPIPostNewUser; 
+}
+
+
+interface IAPIUpdateMeeting {
+  meetingID?: string;
+  meetingInfo?: IAPIPostNewMeeting; 
 }

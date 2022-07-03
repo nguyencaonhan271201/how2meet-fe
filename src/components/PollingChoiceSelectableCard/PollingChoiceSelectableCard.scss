@@ -1,0 +1,132 @@
+.polling-choice-selectable-card { 
+  border: 2px solid #E7785D;
+  border-radius: 30px;
+  padding: 20px;
+  padding-bottom: 60px;
+  padding-top: 15px;
+  position: relative;
+  cursor: pointer;
+  height: 100%;
+
+  &--selected {
+    background: #E7785D;
+
+    .polling-choice-selectable-card__icon {
+      position: absolute;
+      bottom: 15px;
+      right: 15px;
+  
+      svg {
+        path {
+          fill: white;
+        }
+      }
+    }
+  }
+
+  &--not-selectable {
+    cursor: not-allowed;
+  }
+
+  * {
+    font-family: "Quicksans" !important;
+  }
+
+  &__title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__info {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    &--detail {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+
+      p {
+        margin: 0;
+        margin-left: 5px;
+      }
+
+      svg {
+        height: 15px;
+      }
+
+      &__text {
+        display: inline-block;
+        font-size: 15px;
+        color: black;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-left: 5px;
+
+        &--current {
+          font-size: 15px;
+        }
+
+        &:hover {
+          color: black;
+        }
+      }
+    }
+  }
+
+  &__description {
+    font-size: 12px;
+    overflow-wrap: break-word;
+  }
+
+  &__icon {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+
+    svg {
+      path {
+        fill: #E7785D;
+      }
+    }
+  }
+
+  &--add {
+    background: #F2F2F2;
+    border-radius: 30px;
+    padding: 20px;
+    padding-bottom: 35px;
+    position: relative;
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    min-height: 130px;
+  }
+
+  &__participants {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    position: absolute;
+    max-width: 60%;
+    overflow: auto;
+    bottom: 10px;
+    padding-bottom: 10px;
+  }
+
+  &__participant {
+    border-radius: 50%;
+    width: 35px;
+    object-fit: cover;
+    height: 35px;
+
+    &:not(:first-child) {
+      margin-left: -5px;
+    }
+  }
+}

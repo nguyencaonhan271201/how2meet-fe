@@ -13,16 +13,23 @@ export const MeetingCard: React.FC<IMeetingCard> = ({
   time,
   location,
   participants,
+  isHost
 }) => {
   const history = useHistory();
 
   return (
     <div className={`meeting-card ${type === 0 ? "meeting-card--blue" : "meeting-card--green"}`}
-      onClick={() => history.push(`meeting/${meetingID}`)}>
+      onClick={() => {
+        if (isHost) {
+          history.push(`edit-meeting/${meetingID}`)
+        } else {
+          history.push(`meeting/${meetingID}`)
+        }
+      }}>
       <p className="meeting-card__type">{type === 0 ? "Meeting" : "Bonding"}</p>
       <p className="meeting-card__title">{title}</p>
 
-      <div className="meeting-card__info">
+      <div className={`meeting-card__info ${location !== "" ? "meeting-card__info--2-rows" : ""}`}>
         <div className="meeting-card__info--detail">
           <FontAwesomeIcon icon={faClock} />
           <p className={`meeting-card__info--detail__text ${isCurrent ? "meeting-card__info--detail__text--current" : ""}`}>

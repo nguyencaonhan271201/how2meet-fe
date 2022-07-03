@@ -48,11 +48,18 @@
     font-size: 2.5rem;
     color: var(--theme-blue);
     margin-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &__info {
     display: grid;
     grid-template-columns: 1fr;
+
+    &--2-rows {
+      grid-template-columns: 1fr 1fr;
+    }
 
     &--detail {
       display: flex;
