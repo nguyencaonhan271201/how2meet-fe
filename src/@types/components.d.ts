@@ -37,6 +37,7 @@ interface IMeetingCard {
   location?: string;
   participants?: Array<ICreateUserResponse>;
   isHost?: boolean;
+  getDates?: Array<any>;
 }
 
 interface IPollingChoiceCard {
@@ -58,10 +59,12 @@ interface IPollingChoiceSelectableCard extends IPollingChoiceCard {
   setSelected?: () => void;
   isSelectable?: boolean;
   isEditable?: boolean;
+  editableMeeting?: boolean;
 }
 
 interface ISearchBar {
   value?: string,
   selected?: Array<ICreateUserResponse>,
-  setSelected?: any
+  setSelected?: any,
+  editable?: boolean
 }

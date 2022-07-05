@@ -9,7 +9,8 @@ import { useSelector } from 'react-redux';
 export const SearchBar: React.FC<ISearchBar> = ({
   value,
   selected,
-  setSelected
+  setSelected,
+  editable,
 }) => {
   const history = useHistory();
   const dispatch = useAppDispatch();
@@ -88,9 +89,10 @@ export const SearchBar: React.FC<ISearchBar> = ({
 
       <div className="search-bar__input-block">
         <input
-          className="search-bar__input"
+          className={`search-bar__input ${editable !== null ? "search-bar__input--readonly" : ""}`}
           placeholder="username to invite"
           value={searchQuery}
+          readOnly={editable !== null ? true : false}
           onChange={(e: any) => {
             searchUser(e.target.value);
             setSearchQuery(e.target.value);
@@ -117,6 +119,6 @@ export const SearchBar: React.FC<ISearchBar> = ({
           })}
         </div>
       </div>
-    </div>
+    </div >
   );
 };

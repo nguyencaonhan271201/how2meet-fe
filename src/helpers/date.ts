@@ -45,3 +45,13 @@ export const getTimeText = (index: number) => {
 export const getWeekNumber = (date: Date) => {
   return moment(date).week();
 }
+
+export const isMeetingAvailableForEdit = (start: string) => {
+  let startDate = new Date(start);
+  if (startDate) {
+    startDate.setHours(0);
+    startDate.setMinutes(0);
+    startDate.setSeconds(0);
+  }
+  return startDate > new Date(Date.now());
+}

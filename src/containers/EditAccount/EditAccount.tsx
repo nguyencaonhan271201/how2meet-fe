@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Input } from '../../components/Input/Input';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { storage } from '../../configs/firebase';
-import { doGetUserByFirebaseID, doUpdateMeetingParticipantsProfile, doUpdateProfile, RootState, useAppDispatch } from '../../redux';
+import { doGetUserByFirebaseID, doUpdateMeetingParticipantsProfile, doUpdateProfile, resetUpdateProfileStatus, RootState, useAppDispatch } from '../../redux';
 import { useSelector } from 'react-redux';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
@@ -45,6 +45,7 @@ export const EditAccount: React.FC<IEditAccount> = ({ }) => {
         text: 'Your profile is updated!',
       })
         .then(() => {
+          dispatch(resetUpdateProfileStatus());
           history.push("/meetings")
           return;
         })

@@ -17,6 +17,10 @@
     &:focus {
       outline: none;
     }
+
+    &--readonly {
+      cursor: not-allowed;
+    }
   }
 
   &__logo {

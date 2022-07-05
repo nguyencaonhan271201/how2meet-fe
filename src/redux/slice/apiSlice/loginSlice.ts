@@ -34,7 +34,10 @@ const slice = createSlice({
   name: 'login@',
   initialState: initialState,
   reducers: {
-    
+    resetUpdateProfileStatus(state) {
+      state.isUpdateProfile = false;
+      state.updateProfileSuccess = false;
+    }
   },
   extraReducers: (builder) => {
     //doPostNewUser
@@ -84,5 +87,5 @@ const slice = createSlice({
 });
 
 const { reducer, actions } = slice;
-export const {  } = actions;
+export const { resetUpdateProfileStatus } = actions;
 export default reducer;

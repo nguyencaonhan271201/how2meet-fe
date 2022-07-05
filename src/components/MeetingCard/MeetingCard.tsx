@@ -4,6 +4,7 @@ import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons'
 import { faClock } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useHistory } from 'react-router-dom';
+import { isMeetingAvailableForEdit } from '../../helpers/date';
 
 export const MeetingCard: React.FC<IMeetingCard> = ({
   meetingID,
@@ -13,7 +14,8 @@ export const MeetingCard: React.FC<IMeetingCard> = ({
   time,
   location,
   participants,
-  isHost
+  isHost,
+  getDates
 }) => {
   const history = useHistory();
 
@@ -21,7 +23,11 @@ export const MeetingCard: React.FC<IMeetingCard> = ({
     <div className={`meeting-card ${type === 0 ? "meeting-card--blue" : "meeting-card--green"}`}
       onClick={() => {
         if (isHost) {
-          history.push(`edit-meeting/${meetingID}`)
+          if (isMeetingAvailableForEdit((getDates as any)[0])) {
+            history.push(`edit-meeting/${meetingID}`)
+          } else {
+            history.push(`meeting/${meetingID}`)
+          }
         } else {
           history.push(`meeting/${meetingID}`)
         }
