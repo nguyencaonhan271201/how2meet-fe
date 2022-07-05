@@ -1064,6 +1064,7 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
                 isSelectable={!isLimitChoices || (isLimitChoices && (countSelected !== choiceLimit))}
                 isEditable={true}
                 editAction={editAction}
+                editableMeeting={true}
               ></PollingChoiceSelectableCard>
             </div>
           })}

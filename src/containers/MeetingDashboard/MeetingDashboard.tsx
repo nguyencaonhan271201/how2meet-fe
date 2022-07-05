@@ -57,9 +57,24 @@ export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
   useEffect(() => {
     let getCurrentList = [] as any;
     let getArchivedList = [] as any;
+    let getFutureList = [] as any;
 
     meetings?.forEach((meeting: any) => {
-      if (Date.parse(meeting.date[1]) > Date.now()) {
+      let startDate = new Date(meeting.date[0]);
+      if (startDate) {
+        startDate.setHours(0);
+        startDate.setMinutes(0);
+        startDate.setSeconds(0);
+      }
+
+      let endDate = new Date(meeting.date[1]);
+      if (endDate) {
+        endDate.setHours(0);
+        endDate.setMinutes(0);
+        endDate.setSeconds(0);
+      }
+
+      if (endDate > new Date(Date.now())) {
         getCurrentList.push(meeting);
       } else {
         getArchivedList.push(meeting);
@@ -68,11 +83,8 @@ export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
 
     setCurrentList(getCurrentList);
     setArchivedList(getArchivedList);
+    setFutureList(getFutureList);
   }, [meetings]);
-
-  useEffect(() => {
-    console.log(currentList);
-  }, [currentList]);
 
   return (
     <div className="meetings">
@@ -99,6 +111,7 @@ export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
                 ${getCurrentDateFullString(new Date(Date.parse(meeting.date[1])))}`}
                 location={meeting.location}
                 participants={meeting.invitators}
+                getDates={meeting.date}
               ></MeetingCard>
             ))}
           </div>
@@ -121,6 +134,7 @@ export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
               ${getCurrentDateFullString(new Date(Date.parse(meeting.date[1])))}`}
                 location={meeting.location}
                 participants={meeting.invitators}
+                getDates={meeting.date}
               ></MeetingCard>
             ))}
           </div>

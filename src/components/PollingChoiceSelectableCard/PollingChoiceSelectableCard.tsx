@@ -23,6 +23,7 @@ export const PollingChoiceSelectableCard: React.FC<IPollingChoiceSelectableCard>
   isSelectable,
   isEditable,
   editAction,
+  editableMeeting
 }) => {
   const history = useHistory();
   const MySwal = withReactContent(Swal);
@@ -71,21 +72,25 @@ export const PollingChoiceSelectableCard: React.FC<IPollingChoiceSelectableCard>
       ${isSelected ? "polling-choice-selectable-card--selected" : ""}
       ${(!isSelected && !isSelectable) ? "polling-choice-selectable-card--not-selectable" : ""}`}
         onClick={(e: any) => {
-          if (!e.target.classList.contains("polling-choice-selectable-card__participants")
-            && !e.target.classList.contains("polling-choice-selectable-card__participant")) {
-            if (!isSelected) {
-              if (isSelectable) {
+          if (editableMeeting && editableMeeting === true) {
+            if (!e.target.classList.contains("polling-choice-selectable-card__participants")
+              && !e.target.classList.contains("polling-choice-selectable-card__participant")) {
+              if (!isSelected) {
+                if (isSelectable) {
+                  setSelected();
+                }
+              } else {
                 setSelected();
               }
-            } else {
-              setSelected();
             }
           }
         }}
         onContextMenu={(e: any) => {
           e.preventDefault();
-          if (isEditable && editAction) {
-            editAction(choiceID);
+          if (editableMeeting && editableMeeting === true) {
+            if (isEditable && editAction) {
+              editAction(choiceID);
+            }
           }
         }}
       >

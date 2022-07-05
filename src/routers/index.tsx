@@ -71,7 +71,7 @@ export const Routers = () => {
 
         <PrivateRouter
           exact={true}
-          path={'/meeting-minute'}
+          path={'/meeting-minute/:id'}
           component={MeetingMinute}
           layout={OnlyFooterLayout}
           footer={Footer}

@@ -1,11 +1,13 @@
 import './MeetingPage.scss';
 import React, { useEffect, useState, useRef } from 'react';
-import { faArrowLeft, faArrowRight, faLink, faCheck } from '@fortawesome/free-solid-svg-icons'
+import { faArrowLeft, faArrowRight, faLink, faCheck, faKey, faImages, faFileSignature } from '@fortawesome/free-solid-svg-icons'
 import { faCopy } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { getMonday, getMonthNameFromIndex, getNumberOfDaysInMonthAndYear, getSunday, getTimeText, getWeekNumber, isBetween } from '../../helpers/date';
+import {
+  getMonthNameFromIndex, getTimeText, isMeetingAvailableForEdit
+} from '../../helpers/date';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import ReactTooltip from 'react-tooltip';
@@ -13,9 +15,12 @@ import { PollingChoiceCard } from '../../components/PollingChoiceCard/PollingCho
 import { SearchBar } from '../../components/SearchBar/SearchBar';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { doAddInvitatorToMeeting, doCreateMeeting, doGetMeetingByMeetingID, doGetUserByFirebaseID, doUpdateMeeting, resetMeetingCreationStatus, RootState, temporarilySavedUserToAdd, useAppDispatch } from '../../redux';
+import {
+  doAddInvitatorToMeeting, doGetMeetingByMeetingID, doGetUserByFirebaseID,
+  doUpdateMeeting, resetMeetingCreationStatus, RootState, temporarilySavedUserToAdd, useAppDispatch
+} from '../../redux';
 import { useSelector } from 'react-redux';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { PollingChoiceSelectableCard } from '../../components/PollingChoiceSelectableCard/PollingChoiceSelectableCard';
 import { decrypt } from '../../helpers/password';
 
@@ -39,7 +44,8 @@ export const MeetingPage: React.FC<ICreateMeeting> = ({ }) => {
   const numberOfPages = 4;
   const dispatch = useAppDispatch();
   const history = useHistory();
-  const [showPasswordValidationAgain, setShowPasswordValidationAgain] = useState<boolean>(false);
+  const [editableMeeting, setEditableMeeting] = useState<boolean>(true);
+  const [isHost, setIsHost] = useState<boolean>(false);
 
   //Page 0
   const [meetingTitle, setMeetingTitle] = useState<string>("");
@@ -143,6 +149,8 @@ export const MeetingPage: React.FC<ICreateMeeting> = ({ }) => {
   const checkForAccessRights = () => {
     MySwal.close();
 
+    setEditableMeeting(isMeetingAvailableForEdit(meetingInfo?.date[0]));
+    setIsHost(meetingInfo.creator.firebase_id === user?.firebase_id);
     let isPublic = meetingInfo?.isPublic;
 
     if (!isPublic) {
@@ -226,59 +234,6 @@ export const MeetingPage: React.FC<ICreateMeeting> = ({ }) => {
         return;
       }
     })
-  }
-
-  const generateCalendar = () => {
-    let startWeek = getWeekNumber(fromDate);
-    let endWeek = getWeekNumber(toDate);
-
-    let inputBlocks = [];
-    let modifiedEndWeek = endWeek >= startWeek ? endWeek : getWeekNumber(new Date(fromDate.getFullYear(), 11, 31)) - startWeek + 1 + endWeek;
-
-    let currentCheckingDate = new Date(fromDate.getTime());
-    for (let i = startWeek; i <= modifiedEndWeek; i++) {
-      let thisWeek = [];
-
-      if (i !== startWeek) {
-        currentCheckingDate.setTime(currentCheckingDate.getTime() + (7 * 24 * 60 * 60 * 1000));
-      }
-
-      let monday = getMonday(new Date(currentCheckingDate.getTime()));
-      let sunday = getSunday(new Date(currentCheckingDate.getTime()));
-
-      let start = new Date(monday);
-
-      while (start <= sunday) {
-        thisWeek.push({
-          date: new Date(start.getTime()),
-          isSelectable: isBetween(new Date(fromDate.getTime()), new Date(toDate.getTime()), start),
-          status: 1,
-          timeSlots: new Array(32).fill({
-            status: 0,
-            selectors: []
-          }),
-        })
-
-        start.setTime(start.getTime() + (24 * 60 * 60 * 1000));
-      }
-
-      let isNewMonth = thisWeek[0].date.getMonth() !== thisWeek[6].date.getMonth() || thisWeek[0].date.getDate() === 1;
-
-      inputBlocks.push({
-        isNewMonth: isNewMonth,
-        blocks: thisWeek,
-      });
-
-      setInputBlocks(inputBlocks);
-    }
-  }
-
-  const updateStatus = (week: number, weekDay: number) => {
-    let inputBlocksClone = inputBlocks;
-    inputBlocksClone[week]["blocks"][weekDay].status = inputBlocksClone[week]["blocks"][weekDay].status === 0 ? 1 : 0;
-
-    setInputBlocks(inputBlocksClone);
-    setRenderCalendar(renderCalendar + 1);
   }
 
   const nextPage = () => {
@@ -512,6 +467,11 @@ export const MeetingPage: React.FC<ICreateMeeting> = ({ }) => {
   }
 
   const saveMeeting = () => {
+    if (!editableMeeting) {
+      history.push("/meetings");
+      return;
+    }
+
     MySwal.showLoading();
 
     let dateBlocks = [] as any;
@@ -1009,9 +969,9 @@ export const MeetingPage: React.FC<ICreateMeeting> = ({ }) => {
                               <div
                                 className={`create-meeting__time__time-range--time-slot 
                                   ${key % 2 === 1 && key !== 31 ? "create-meeting__time__time-range--time-slot--divider" : ""}`}
-                                onMouseDown={(e: any) => { onMouseDown(e, indexInWeek) }}
-                                onMouseUp={(e: any) => { onMouseUp(e, indexInWeek) }}
-                                onMouseMove={(e: any) => { onMouseMove(e, indexInWeek) }}
+                                onMouseDown={(e: any) => { if (editableMeeting) onMouseDown(e, indexInWeek) }}
+                                onMouseUp={(e: any) => { if (editableMeeting) onMouseUp(e, indexInWeek) }}
+                                onMouseMove={(e: any) => { if (editableMeeting) onMouseMove(e, indexInWeek) }}
                                 onMouseEnter={(e: any) => { onMouseEnter(e, indexInWeek) }}
                                 onMouseOut={(e: any) => { onMouseOut(e, indexInWeek) }}
                                 style={{
@@ -1093,13 +1053,14 @@ export const MeetingPage: React.FC<ICreateMeeting> = ({ }) => {
                 selectors={poll.selectors}
                 isSelected={poll.selectors?.some((selector: any) => selector.firebase_id === user?.firebase_id)}
                 setSelected={() => handleSelect(index)}
-                isSelectable={!isLimitChoices || (isLimitChoices && (countSelected !== choiceLimit))}
-                isEditable={(creator.firebase_id === user?.firebase_id) || (poll.creator && poll.creator === user?.firebase_id)}
+                isSelectable={(!isLimitChoices || (isLimitChoices && (countSelected !== choiceLimit))) && editableMeeting}
+                isEditable={editableMeeting && ((creator.firebase_id === user?.firebase_id) || (poll.creator && poll.creator === user?.firebase_id))}
                 editAction={editAction}
+                editableMeeting={editableMeeting}
               ></PollingChoiceSelectableCard>
             </div>
           })}
-          {letUserAdd && <div className="meeting-page__action-polling__options--single">
+          {letUserAdd && editableMeeting && <div className="meeting-page__action-polling__options--single">
             <PollingChoiceSelectableCard
               isAddCard={true}
               addAction={addAction}
@@ -1110,6 +1071,80 @@ export const MeetingPage: React.FC<ICreateMeeting> = ({ }) => {
 
       </div>}
 
+      {currentPage === 4 && <div className="create-meeting__confirmation">
+        <h1 className="create-meeting__title">{meetingTitle !== "" ? meetingTitle : "Meeting"}
+        </h1>
+
+        <span>
+          <label className="switch" style={{ marginRight: "5px" }}>
+            <input type="checkbox" checked={isPublic}></input>
+            <span className="slider round"></span>
+          </label>
+          {` `}
+          {isPublic ? <span
+            style={{ color: "var(--theme-green)", marginRight: "4px" }}
+          >public</span> : "private"}
+        </span>
+
+        {/* Private mode */}
+        {!isPublic && <SearchBar
+          selected={selectedInvitators}
+          setSelected={setSelectedInvitators}
+          editable={false}
+        ></SearchBar>}
+
+        {/* Public mode */}
+        {isPublic && <div className="create-meeting__confirmation--public">
+          <div className="create-meeting__public-link">
+            <FontAwesomeIcon icon={faLink}></FontAwesomeIcon>
+            <p className="create-meeting__public-link--link" style={{ margin: 0 }}
+              onClick={() => {
+                navigator.clipboard.writeText(`${window.location.origin}/meeting/${meetingID}`);
+                toast("Copied to clipboard", {
+                  position: "top-right",
+                  autoClose: 1000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                })
+              }}>
+              {window.location.origin}/meeting/{meetingID}
+            </p>
+            <FontAwesomeIcon icon={faCopy}></FontAwesomeIcon>
+          </div>
+
+          <div className="create-meeting__public-link"
+            style={{
+              display: "flex",
+              marginTop: 5
+            }}>
+            <FontAwesomeIcon icon={faKey}></FontAwesomeIcon>
+            <p className="create-meeting__public-link--link"
+              style={{
+                margin: 0,
+                textDecorationColor: "underline"
+              }}
+              onClick={() => {
+                navigator.clipboard.writeText(`${meetingPassword}`);
+                toast("Copied to clipboard", {
+                  position: "top-right",
+                  autoClose: 1000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                })
+              }}>
+              {decrypt(meetingPassword)}
+            </p>
+            <FontAwesomeIcon icon={faCopy}></FontAwesomeIcon>
+          </div>
+        </div>}
+      </div>}
+
       <div className="meeting-page__controls">
         {currentPage > 2 && <button className="meeting-page__prev" onClick={() => {
           setCurrentPage(currentPage - 1);
@@ -1117,18 +1152,47 @@ export const MeetingPage: React.FC<ICreateMeeting> = ({ }) => {
           <FontAwesomeIcon icon={faArrowLeft}></FontAwesomeIcon>
         </button>}
 
-        {(currentPage !== numberOfPages - 1) && <button className="meeting-page__next" onClick={() => {
-          nextPage();
-        }}>
-          <FontAwesomeIcon icon={faArrowRight}></FontAwesomeIcon>
-        </button>}
+        {((!isHost && currentPage !== numberOfPages - 1) || (isHost && currentPage !== numberOfPages))
+          && <button className="meeting-page__next" onClick={() => {
+            nextPage();
+          }}>
+            <FontAwesomeIcon icon={faArrowRight}></FontAwesomeIcon>
+          </button>}
 
-        {(currentPage === numberOfPages - 1) && <button className="meeting-page__next" onClick={() => {
-          saveMeeting();
-        }}>
-          <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
-        </button>}
+        {((!isHost && currentPage === numberOfPages - 1) || (isHost && currentPage === numberOfPages))
+          && <button className="meeting-page__next" onClick={() => {
+            saveMeeting();
+          }}>
+            <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
+          </button>}
       </div>
+
+      {!editableMeeting &&
+        <div className="meeting-page__current-meeting-controls">
+          <div
+            className="meeting-page__current-meeting-controls--option"
+            onClick={() => {
+              history.push(`/meeting-image/${paramMeetingID}`);
+            }}>
+            <FontAwesomeIcon
+              icon={faImages}
+              className={"meeting-page__current-meeting-controls__icon--1"}
+            ></FontAwesomeIcon>
+            <p className="meeting-page__current-meeting-controls--caption">Images</p>
+          </div>
+          <div
+            className="meeting-page__current-meeting-controls--option"
+            onClick={() => {
+              history.push(`/meeting-minute/${paramMeetingID}`);
+            }}>
+            <FontAwesomeIcon
+              icon={faFileSignature}
+              className={"meeting-page__current-meeting-controls__icon--2"}
+            ></FontAwesomeIcon>
+            <p className="meeting-page__current-meeting-controls--caption">Minutes</p>
+          </div>
+
+        </div>}
 
       <ToastContainer />
     </div >
