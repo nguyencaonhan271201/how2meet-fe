@@ -61,3 +61,7 @@ interface IAPIUpdateMeeting {
   meetingID?: string;
   meetingInfo?: IAPIPostNewMeeting; 
 }
+
+interface IAPIGetMeetingImages {
+  meetingID?: string;
+}

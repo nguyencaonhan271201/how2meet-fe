@@ -48,4 +48,10 @@ interface IMeetingSlice {
   isUpdateMeeting?: boolean;
   updateMeetingSuccess?: boolean;
   updateMeetingError?: any;
+
+  meetingImages?: Array<ICreateMeetingImagesResponse>;
+  isGettingMeetingImages?: boolean;
+  getMeetingImagesSuccess?: boolean;
+  gettingMeetingImagesError?: any;
 }
+

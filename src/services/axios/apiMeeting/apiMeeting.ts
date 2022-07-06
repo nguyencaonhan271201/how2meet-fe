@@ -31,4 +31,9 @@ export const apiMeeting = {
     const url = `/meeting/updateMeeting/${param.meetingID}`;
     return axiosTest.post(url, param.meetingInfo);
   },
+
+  getMeetingImages: (param: IAPIGetMeetingImages) => {
+    const url = `/meetingimages/${param.meetingID}`;
+    return axiosTest.get(url);
+  },
 };

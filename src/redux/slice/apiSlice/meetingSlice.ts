@@ -35,6 +35,12 @@ export const doUpdateMeeting
   return result.data;
 });
 
+export const doGetMeetingImages 
+= createAsyncThunk('apiMeeting@get/meetingImages', async (param: IAPIGetMeetingImages) => {
+  const result: AxiosResponse = await apiMeeting.getMeetingImages(param);
+  return result.data;
+});
+
 const initialState = {
   isCreatingNewMeeting: false,
   createNewMeetingSuccess: false,
@@ -58,6 +64,11 @@ const initialState = {
   isUpdateMeeting: false,
   updateMeetingSuccess: false,
   updateMeetingError: {},
+
+  meetingImages: [],
+  isGettingMeetingImages: false,
+  getMeetingImagesSuccess: false,
+  gettingMeetingImagesError: {},
 } as IMeetingSlice;
 
 const slice = createSlice({
@@ -175,6 +186,26 @@ const slice = createSlice({
       state.updateMeetingSuccess = false;
       state.isUpdateMeeting = true;
       state.updateMeetingError = {
+        error: "Error occured"
+      }
+    });
+
+    //doGetMeetingImages
+    builder.addCase(doGetMeetingImages.pending, (state) => {
+      state.isGettingMeetingImages = true;
+      state.getMeetingImagesSuccess = false;
+      state.gettingMeetingImagesError = {};
+      state.meetingImages = [];
+    });
+    builder.addCase(doGetMeetingImages.fulfilled, (state, action) => {
+      state.getMeetingImagesSuccess = true;
+      state.isGettingMeetingImages = false;
+      state.meetingImages = action.payload;
+    });
+    builder.addCase(doGetMeetingImages.rejected, (state, action) => {
+      state.getMeetingImagesSuccess = false;
+      state.isGettingMeetingImages = true;
+      state.gettingMeetingImagesError = {
         error: "Error occured"
       }
     });
