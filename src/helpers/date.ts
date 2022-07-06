@@ -4,6 +4,10 @@ export const getCurrentDateFullString = (date: Date) => {
   return moment(date).format('DD/MM/YYYY');
 };
 
+export const getCurrentDateShortString = (date: Date) => {
+  return moment(date).format('DD/MM');
+};
+
 export const getMonthNameFromIndex = (i: number) => {
   let array = ["January", "February", "March", "April", "May", "June", "July", "August", "September",
   "October", "November", "December"];

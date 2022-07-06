@@ -38,3 +38,9 @@ interface ICreateMeetingResponse extends ICreateResponse {
   meetingID?: string;
   invitators?: Array<ICreateUserResponse>;
 }
+
+interface ICreateMeetingImagesResponse extends ICreateResponse {
+  imageURL?: string;
+  meetingID?: string;
+  creator?: ICreateUserResponse
+}
