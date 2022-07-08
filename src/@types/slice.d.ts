@@ -53,5 +53,13 @@ interface IMeetingSlice {
   isGettingMeetingImages?: boolean;
   getMeetingImagesSuccess?: boolean;
   gettingMeetingImagesError?: any;
+
+  isCreateMeetingImage?: boolean;
+  createMeetingImageSuccess?: boolean;
+  createMeetingImageError?: any;
+
+  isDeleteMeetingImage?: boolean;
+  deleteMeetingImageSuccess?: boolean;
+  deleteMeetingImageError?: any;
 }
 

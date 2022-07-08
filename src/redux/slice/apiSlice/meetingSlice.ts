@@ -41,6 +41,18 @@ export const doGetMeetingImages
   return result.data;
 });
 
+export const doCreateMeetingImage
+= createAsyncThunk('apiMeeting@post/createMeetingImage', async (param: IAPICreateMeetingImage) => {
+  const result: AxiosResponse = await apiMeeting.createMeetingImage(param);
+  return result.data;
+});
+
+export const doDeleteMeetingImage
+= createAsyncThunk('apiMeeting@delete/meetingImage', async (param: IAPIDeleteMeetingImage) => {
+  const result: AxiosResponse = await apiMeeting.deleteMeetingImage(param);
+  return result.data;
+});
+
 const initialState = {
   isCreatingNewMeeting: false,
   createNewMeetingSuccess: false,
@@ -69,6 +81,14 @@ const initialState = {
   isGettingMeetingImages: false,
   getMeetingImagesSuccess: false,
   gettingMeetingImagesError: {},
+
+  isCreateMeetingImage: false,
+  createMeetingImageSuccess: false,
+  createMeetingImageError: {},
+
+  isDeleteMeetingImage: false,
+  deleteMeetingImageSuccess: false,
+  deleteMeetingImageError: {},
 } as IMeetingSlice;
 
 const slice = createSlice({
@@ -93,6 +113,15 @@ const slice = createSlice({
 
     updateMeetingPublic(state, action) {
       state.meetingByID.isPublic = action.payload.isPublic;
+    },
+
+    resetMeetingImageStatus(state) {
+      state.isCreateMeetingImage = false;
+      state.createMeetingImageSuccess = false;
+      state.createMeetingImageError = {};
+      state.isDeleteMeetingImage = false;
+      state.deleteMeetingImageSuccess = false;
+      state.deleteMeetingImageError = {};
     }
   },
   extraReducers: (builder) => {
@@ -209,9 +238,47 @@ const slice = createSlice({
         error: "Error occured"
       }
     });
+
+    //doCreateMeetingImage
+    builder.addCase(doCreateMeetingImage.pending, (state) => {
+      state.isCreateMeetingImage = true;
+      state.createMeetingImageSuccess = false;
+      state.createMeetingImageError = {};
+    });
+    builder.addCase(doCreateMeetingImage.fulfilled, (state, action) => {
+      state.createMeetingImageSuccess = true;
+      state.isCreateMeetingImage = false;
+      state.meetingImages = action.payload;
+    });
+    builder.addCase(doCreateMeetingImage.rejected, (state, action) => {
+      state.createMeetingImageSuccess = false;
+      state.isCreateMeetingImage = true;
+      state.createMeetingImageError = {
+        error: "Error occured"
+      }
+    });
+
+    //doCreateMeetingImage
+    builder.addCase(doDeleteMeetingImage.pending, (state) => {
+      state.isDeleteMeetingImage = true;
+      state.deleteMeetingImageSuccess = false;
+      state.deleteMeetingImageError = {};
+    });
+    builder.addCase(doDeleteMeetingImage.fulfilled, (state, action) => {
+      state.deleteMeetingImageSuccess = true;
+      state.isDeleteMeetingImage = false;
+    });
+    builder.addCase(doDeleteMeetingImage.rejected, (state, action) => {
+      state.deleteMeetingImageSuccess = false;
+      state.isDeleteMeetingImage = true;
+      state.deleteMeetingImageError = {
+        error: "Error occured"
+      }
+    });
   },
 });
 
 const { reducer, actions } = slice;
-export const { resetMeetingCreationStatus, temporarilySavedUserToAdd, updateMeetingPublic } = actions;
+export const { resetMeetingCreationStatus, temporarilySavedUserToAdd, updateMeetingPublic,
+  resetMeetingImageStatus } = actions;
 export default reducer;
