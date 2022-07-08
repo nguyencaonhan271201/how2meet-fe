@@ -65,3 +65,13 @@ interface IAPIUpdateMeeting {
 interface IAPIGetMeetingImages {
   meetingID?: string;
 }
+
+interface IAPICreateMeetingImage {
+  imageURL?: string;
+  meetingID?: string;
+  creator?: ICreateUserResponse;
+}
+
+interface IAPIDeleteMeetingImage {
+  image_id?: string;
+}

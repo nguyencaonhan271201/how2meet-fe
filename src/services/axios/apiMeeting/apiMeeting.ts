@@ -36,4 +36,14 @@ export const apiMeeting = {
     const url = `/meetingimages/${param.meetingID}`;
     return axiosTest.get(url);
   },
+
+  createMeetingImage: (param: IAPICreateMeetingImage) => {
+    const url = `/meetingimages`;
+    return axiosTest.post(url, param);
+  },
+
+  deleteMeetingImage: (param: IAPIDeleteMeetingImage) => {
+    const url = `/meetingimages/${param.image_id}`;
+    return axiosTest.delete(url);
+  },
 };

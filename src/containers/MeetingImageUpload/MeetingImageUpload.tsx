@@ -14,7 +14,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { useSelector } from 'react-redux';
-import { doGetMeetingByMeetingID, doGetMeetingImages, doGetUserByFirebaseID, RootState, useAppDispatch } from '../../redux';
+import { doCreateMeetingImage, doDeleteMeetingImage, doGetMeetingByMeetingID, doGetMeetingImages, doGetUserByFirebaseID, resetMeetingImageStatus, RootState, useAppDispatch } from '../../redux';
 import { getCurrentDateShortString } from '../../helpers/date';
 
 export const MeetingImageUpload: React.FC<IMeetingImageUpload> = ({ }) => {
@@ -24,9 +24,10 @@ export const MeetingImageUpload: React.FC<IMeetingImageUpload> = ({ }) => {
   const { user } = useSelector(
     (state: RootState) => state.loginSlice,
   );
-  const { isGettingMeetingImages, getMeetingImagesSuccess, meetingImages } = useSelector(
-    (state: RootState) => state.meetingSlice,
-  );
+  const { createMeetingImageSuccess, deleteMeetingImageSuccess,
+    getMeetingImagesSuccess, meetingImages } = useSelector(
+      (state: RootState) => state.meetingSlice,
+    );
   const { meetingByID: meetingInfo } = useSelector(
     (state: RootState) => state.meetingSlice,
   );
@@ -42,7 +43,12 @@ export const MeetingImageUpload: React.FC<IMeetingImageUpload> = ({ }) => {
   const dispatch = useAppDispatch();
   const history = useHistory();
   const [update, setUpdate] = useState<number>(0);
-  const [removedList, setRemovedList] = useState<Array<string>>();
+  const [removedList, setRemovedList] = useState<Array<string>>([]);
+
+  const countUpload = useRef<number>(0);
+  const countUploaded = useRef<number>(0);
+  const countDelete = useRef<number>(0);
+  const countDeleted = useRef<number>(0);
 
   //Hooks
   useEffect(() => {
@@ -86,7 +92,7 @@ export const MeetingImageUpload: React.FC<IMeetingImageUpload> = ({ }) => {
     if (getMeetingImagesSuccess) {
       let imagesList = [];
 
-      meetingImages.forEach((image: any) => {
+      meetingImages?.forEach((image: any) => {
         imagesList.push({
           ...image,
           isNew: false
@@ -98,10 +104,49 @@ export const MeetingImageUpload: React.FC<IMeetingImageUpload> = ({ }) => {
   }, [getMeetingImagesSuccess]);
 
   useEffect(() => {
+    if (deleteMeetingImageSuccess) {
+      countDeleted.current += 1;
+
+      if (countDeleted.current === countDelete.current
+        && countUpload.current === countUploaded.current) {
+        showCompleteSwal();
+      }
+    }
+
+    console.log(deleteMeetingImageSuccess);
+  }, [deleteMeetingImageSuccess]);
+
+  useEffect(() => {
+    if (createMeetingImageSuccess) {
+      countUploaded.current += 1;
+
+      if (countDeleted.current === countDelete.current
+        && countUpload.current === countUploaded.current) {
+        showCompleteSwal();
+      }
+    }
+  }, [createMeetingImageSuccess]);
+
+  useEffect(() => {
     console.log(imagesList);
   }, [imagesList]);
 
   //Helper functions
+  const showCompleteSwal = () => {
+    MySwal.close();
+
+    MySwal.fire({
+      icon: 'success',
+      title: 'Success...',
+      text: 'Your meeting image is uploaded successfully!',
+    })
+      .then(() => {
+        dispatch(resetMeetingImageStatus());
+        history.push("/meetings")
+        return;
+      })
+  }
+
   const checkForAccessRights = () => {
     MySwal.close();
 
@@ -158,12 +203,21 @@ export const MeetingImageUpload: React.FC<IMeetingImageUpload> = ({ }) => {
     imagesList.forEach((image: any) => {
       if (image.isNew) {
         //TODO: Create new in database
-
+        countUpload.current += 1;
+        dispatch(doCreateMeetingImage({
+          meetingID: image.meetingID,
+          imageURL: image.imageURL,
+          creator: image.creator
+        }))
       }
     })
 
-    removedList.forEach((imageID: string) => {
+    removedList?.forEach((imageID: string) => {
       //TODO: Remove from current database
+      countDelete.current += 1;
+      dispatch(doDeleteMeetingImage({
+        image_id: imageID,
+      }))
     })
   }
 
