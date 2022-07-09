@@ -75,3 +75,24 @@ interface IAPICreateMeetingImage {
 interface IAPIDeleteMeetingImage {
   image_id?: string;
 }
+
+interface IAPIGetMeetingMinute {
+  minuteID?: string;
+}
+
+interface IAPICreateMeetingMinute {
+  title?: string;
+  description?: string;
+  content?: string;
+  creator?: ICreateUserResponse;
+  meetingID?: string;
+}
+
+interface IAPIUpdateMeetingMinute {
+  updateContent?: IAPICreateMeetingMinute;
+  minuteID?: string;
+}
+
+interface IAPIDeleteMeetingMinute {
+  minute_id?: string;
+}

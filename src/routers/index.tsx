@@ -21,6 +21,7 @@ import { MeetingImageUpload } from '../containers/MeetingImageUpload/MeetingImag
 import { EditAccount } from '../containers/EditAccount/EditAccount';
 import { MeetingPage } from '../containers/MeetingPage/MeetingPage';
 import { EditMeeting } from '../containers/EditMeeting/EditMeeting';
+import { MeetingMinuteDashboard } from '../containers/MeetingMinuteDashboard/MeetingMinuteDashboard';
 
 export const Routers = () => {
   return (
@@ -71,15 +72,6 @@ export const Routers = () => {
 
         <PrivateRouter
           exact={true}
-          path={'/meeting-minute/:id'}
-          component={MeetingMinute}
-          layout={OnlyFooterLayout}
-          footer={Footer}
-          isHasFooter={true}
-        />
-
-        <PrivateRouter
-          exact={true}
           path={'/meeting-image/:id'}
           component={MeetingImageUpload}
           layout={OnlyFooterLayout}
@@ -104,6 +96,25 @@ export const Routers = () => {
           footer={Footer}
           isHasFooter={true}
         />
+
+        <PrivateRouter
+          exact={true}
+          path={'/meeting-minute/:id'}
+          component={MeetingMinuteDashboard}
+          layout={OnlyFooterLayout}
+          footer={Footer}
+          isHasFooter={true}
+        />
+
+        <PrivateRouter
+          exact={true}
+          path={'/meeting-minute/:id/:minute_id'}
+          component={MeetingMinute}
+          layout={OnlyFooterLayout}
+          footer={Footer}
+          isHasFooter={true}
+        />
+
       </Switch>
     </Router>
   );

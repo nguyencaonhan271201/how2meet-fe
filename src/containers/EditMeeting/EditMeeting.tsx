@@ -13,7 +13,10 @@ import { PollingChoiceCard } from '../../components/PollingChoiceCard/PollingCho
 import { SearchBar } from '../../components/SearchBar/SearchBar';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { doCreateMeeting, doGetMeetingByMeetingID, doGetUserByFirebaseID, doUpdateMeeting, resetMeetingCreationStatus, RootState, updateMeetingPublic, useAppDispatch } from '../../redux';
+import {
+  doCreateMeeting, doGetMeetingByMeetingID, doGetUserByFirebaseID, doUpdateMeeting,
+  resetMeetingCreationStatus, RootState, updateMeetingPublic, useAppDispatch
+} from '../../redux';
 import { useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import { decrypt } from '../../helpers/password';
@@ -26,7 +29,7 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
   const { user } = useSelector(
     (state: RootState) => state.loginSlice,
   );
-  const { isUpdateMeeting, updateMeetingSuccess } = useSelector(
+  const { isUpdateMeeting, updateMeetingSuccess, updateMeetingError } = useSelector(
     (state: RootState) => state.meetingSlice,
   );
   const { meetingByID: meetingInfo } = useSelector(
@@ -137,6 +140,14 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
           history.push("/meetings")
           return;
         })
+    } else if (!isUpdateMeeting && !updateMeetingSuccess && updateMeetingError?.error) {
+      MySwal.close();
+
+      MySwal.fire({
+        icon: 'error',
+        title: 'Error...',
+        text: 'Error occured! Your meeting cannot be edited!',
+      })
     }
   }, [isUpdateMeeting, updateMeetingSuccess]);
 

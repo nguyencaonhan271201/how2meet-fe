@@ -23,7 +23,7 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
   const { user } = useSelector(
     (state: RootState) => state.loginSlice,
   );
-  const { isCreatingNewMeeting, createNewMeetingSuccess } = useSelector(
+  const { isCreatingNewMeeting, createNewMeetingSuccess, createNewMeetingError } = useSelector(
     (state: RootState) => state.meetingSlice,
   );
 
@@ -95,6 +95,14 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
           history.push("/meetings")
           return;
         })
+    } else if (!isCreatingNewMeeting && !createNewMeetingSuccess && createNewMeetingError?.error) {
+      MySwal.close();
+
+      MySwal.fire({
+        icon: 'error',
+        title: 'Error...',
+        text: 'Error occured! Your meeting cannot be created!',
+      })
     }
   }, [isCreatingNewMeeting, createNewMeetingSuccess]);
 

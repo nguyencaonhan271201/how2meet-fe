@@ -46,4 +46,29 @@ export const apiMeeting = {
     const url = `/meetingimages/${param.image_id}`;
     return axiosTest.delete(url);
   },
+
+  getMeetingMinutes: (param: IAPIGetMeetingImages) => {
+    const url = `/meetingminutes/${param.meetingID}`;
+    return axiosTest.get(url);
+  },
+
+  getMeetingMinute: (param: IAPIGetMeetingMinute) => {
+    const url = `/meetingminutes/getSingle/${param.minuteID}`;
+    return axiosTest.get(url);
+  },
+
+  createMeetingMinute: (param: IAPICreateMeetingMinute) => {
+    const url = `/meetingminutes`;
+    return axiosTest.post(url, param);
+  },
+
+  updateMeetingMinute: (param: IAPIUpdateMeetingMinute) => {
+    const url = `/meetingminutes/${param.minuteID}`;
+    return axiosTest.post(url, param.updateContent);
+  },
+
+  deleteMeetingMinute: (param: IAPIDeleteMeetingMinute) => {
+    const url = `/meetingminutes/${param.minute_id}`;
+    return axiosTest.delete(url);
+  },
 };

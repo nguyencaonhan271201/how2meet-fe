@@ -61,5 +61,26 @@ interface IMeetingSlice {
   isDeleteMeetingImage?: boolean;
   deleteMeetingImageSuccess?: boolean;
   deleteMeetingImageError?: any;
+
+  meetingMinutes?: Array<ICreateMeetingImagesResponse>;
+  isGettingMeetingMinutes?: boolean;
+  getMeetingMinutesSuccess?: boolean;
+  gettingMeetingMinutesError?: any;
+
+  minuteById?: ICreateMeetingMinutesResponse;
+  isGettingMinuteById?: boolean;
+  getMinuteByIdError?: any;
+
+  isCreatingNewMeetingMinute?: boolean;
+  createNewMeetingMinuteSuccess?: boolean;
+  createNewMeetingMinuteError?: any;
+
+  isUpdatingMeetingMinute?: boolean;
+  updateMeetingMinuteSuccess?: boolean;
+  updateMeetingMinuteError?: any;
+
+  isDeletingMeetingMinute?: boolean;
+  deleteMeetingMinuteSuccess?: boolean;
+  deleteMeetingMinuteError?: any;
 }
 

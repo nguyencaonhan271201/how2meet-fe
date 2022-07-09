@@ -1,5 +1,9 @@
 import moment from 'moment';
 
+export const getCurrentDateTimeFullString = (date: Date) => {
+  return moment(date).format('DD/MM/YYYY hh:mm');
+};
+
 export const getCurrentDateFullString = (date: Date) => {
   return moment(date).format('DD/MM/YYYY');
 };
