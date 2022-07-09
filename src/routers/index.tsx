@@ -22,6 +22,8 @@ import { EditAccount } from '../containers/EditAccount/EditAccount';
 import { MeetingPage } from '../containers/MeetingPage/MeetingPage';
 import { EditMeeting } from '../containers/EditMeeting/EditMeeting';
 import { MeetingMinuteDashboard } from '../containers/MeetingMinuteDashboard/MeetingMinuteDashboard';
+import { FooterNoFixed } from '../components/FooterNoFixed/FooterNoFixed';
+import { OnlyFooter150Layout } from '../layouts/OnlyFooter150Layout/OnlyFooter150Layout';
 
 export const Routers = () => {
   return (
@@ -110,8 +112,8 @@ export const Routers = () => {
           exact={true}
           path={'/meeting-minute/:id/:minute_id'}
           component={MeetingMinute}
-          layout={OnlyFooterLayout}
-          footer={Footer}
+          layout={OnlyFooter150Layout}
+          footer={FooterNoFixed}
           isHasFooter={true}
         />
 

@@ -11,8 +11,8 @@
     margin: 0 auto !important;
   }
 
-  .ck-editor__editable, .ck-editor__main {
-    height: 60vh !important;
+  .ck-content, .ck-editor__main {
+    height: 110vh !important;
   }
 
   &__title {
@@ -99,7 +99,7 @@
   &__description {
     outline: none;
     border: none;
-    width: 40%;
+    width: 50%;
     color: var(--theme-blue);
 
     @media screen and (max-width: 768px){
@@ -147,3 +147,4 @@
     }
   }
 }
+

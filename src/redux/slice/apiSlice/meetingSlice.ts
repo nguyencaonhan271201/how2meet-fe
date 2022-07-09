@@ -317,7 +317,6 @@ const slice = createSlice({
     builder.addCase(doCreateMeetingImage.fulfilled, (state, action) => {
       state.createMeetingImageSuccess = true;
       state.isCreateMeetingImage = false;
-      state.meetingImages = action.payload;
     });
     builder.addCase(doCreateMeetingImage.rejected, (state, action) => {
       state.createMeetingImageSuccess = false;

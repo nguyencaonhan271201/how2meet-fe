@@ -1,0 +1,15 @@
+.only-footer-150 {
+  min-height: calc(150vh + 60px);
+  position: relative;
+  
+  &__footer {
+   display: flex;
+  }
+  &__center {
+    display: flex;
+    height: 150vh;
+  }
+  &__container {
+    display: flex;
+  }
+}

@@ -202,6 +202,9 @@ export const MeetingMinute: React.FC<IMeetingMinute> = ({ }) => {
       setIsDeletable(false);
       setCreator(user);
       setCreated(getCurrentDateTimeFullString(new Date(Date.now())));
+      setMinuteData("");
+      setTitle("");
+      setDescription("");
     }
   }
 
@@ -283,7 +286,7 @@ export const MeetingMinute: React.FC<IMeetingMinute> = ({ }) => {
         <textarea
           className="meeting-minutes__description"
           placeholder="desc..."
-          rows={1}
+          rows={3}
           value={description}
           onChange={(e: any) => setDescription(e.target.value)}>
           {description}

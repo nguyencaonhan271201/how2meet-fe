@@ -92,6 +92,8 @@ export const MeetingImageUpload: React.FC<IMeetingImageUpload> = ({ }) => {
     if (getMeetingImagesSuccess) {
       let imagesList = [];
 
+      console.log("Test", meetingImages);
+
       meetingImages?.forEach((image: any) => {
         imagesList.push({
           ...image,
