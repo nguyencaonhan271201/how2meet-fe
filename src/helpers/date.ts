@@ -1,5 +1,9 @@
 import moment from 'moment';
 
+export const getCurrentDateTimeFullString = (date: Date) => {
+  return moment(date).format('DD/MM/YYYY hh:mm');
+};
+
 export const getCurrentDateFullString = (date: Date) => {
   return moment(date).format('DD/MM/YYYY');
 };
@@ -47,7 +51,7 @@ export const getTimeText = (index: number) => {
 }
 
 export const getWeekNumber = (date: Date) => {
-  return moment(date).week();
+  return moment(date).isoWeek();
 }
 
 export const isMeetingAvailableForEdit = (start: string) => {

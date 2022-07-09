@@ -44,3 +44,11 @@ interface ICreateMeetingImagesResponse extends ICreateResponse {
   meetingID?: string;
   creator?: ICreateUserResponse
 }
+
+interface ICreateMeetingMinutesResponse extends ICreateResponse {
+  content?: string;
+  title?: string;
+  description?: string;
+  meetingID?: string;
+  creator?: ICreateUserResponse
+}

@@ -13,11 +13,15 @@ import { PollingChoiceCard } from '../../components/PollingChoiceCard/PollingCho
 import { SearchBar } from '../../components/SearchBar/SearchBar';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { doCreateMeeting, doGetMeetingByMeetingID, doGetUserByFirebaseID, doUpdateMeeting, resetMeetingCreationStatus, RootState, updateMeetingPublic, useAppDispatch } from '../../redux';
+import {
+  doCreateMeeting, doGetMeetingByMeetingID, doGetUserByFirebaseID, doUpdateMeeting,
+  resetMeetingCreationStatus, RootState, updateMeetingPublic, useAppDispatch
+} from '../../redux';
 import { useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import { decrypt } from '../../helpers/password';
 import { PollingChoiceSelectableCard } from '../../components/PollingChoiceSelectableCard/PollingChoiceSelectableCard';
+import { validateURL } from '../../helpers/validate';
 
 export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
   document.title = "How2Meet? | Edit Meeting";
@@ -26,7 +30,7 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
   const { user } = useSelector(
     (state: RootState) => state.loginSlice,
   );
-  const { isUpdateMeeting, updateMeetingSuccess } = useSelector(
+  const { isUpdateMeeting, updateMeetingSuccess, updateMeetingError } = useSelector(
     (state: RootState) => state.meetingSlice,
   );
   const { meetingByID: meetingInfo } = useSelector(
@@ -137,6 +141,14 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
           history.push("/meetings")
           return;
         })
+    } else if (!isUpdateMeeting && !updateMeetingSuccess && updateMeetingError?.error) {
+      MySwal.close();
+
+      MySwal.fire({
+        icon: 'error',
+        title: 'Error...',
+        text: 'Error occured! Your meeting cannot be edited!',
+      })
     }
   }, [isUpdateMeeting, updateMeetingSuccess]);
 
@@ -320,6 +332,12 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
           if (errorText !== "")
             errorText += '<br>'
           errorText += `please input the description.`
+        }
+
+        if (link !== "" && !validateURL(link)) {
+          if (errorText !== "")
+            errorText += '<br>'
+          errorText += `the link is not valid.`
         }
 
         if (errorText === "") {
@@ -796,6 +814,9 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
       setCountSelected(countSelected + 1);
     }
 
+    pollOptionsClone.sort((optionA: any, optionB: any) => (
+      optionA.selectors.length <= optionB.selectors.length ? 1 : -1
+    ))
     setPollOptions(pollOptionsClone);
   }
 

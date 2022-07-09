@@ -92,6 +92,8 @@ export const MeetingImageUpload: React.FC<IMeetingImageUpload> = ({ }) => {
     if (getMeetingImagesSuccess) {
       let imagesList = [];
 
+      console.log("Test", meetingImages);
+
       meetingImages?.forEach((image: any) => {
         imagesList.push({
           ...image,
@@ -112,8 +114,6 @@ export const MeetingImageUpload: React.FC<IMeetingImageUpload> = ({ }) => {
         showCompleteSwal();
       }
     }
-
-    console.log(deleteMeetingImageSuccess);
   }, [deleteMeetingImageSuccess]);
 
   useEffect(() => {
@@ -126,10 +126,6 @@ export const MeetingImageUpload: React.FC<IMeetingImageUpload> = ({ }) => {
       }
     }
   }, [createMeetingImageSuccess]);
-
-  useEffect(() => {
-    console.log(imagesList);
-  }, [imagesList]);
 
   //Helper functions
   const showCompleteSwal = () => {

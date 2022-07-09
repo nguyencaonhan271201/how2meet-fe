@@ -66,8 +66,11 @@ export const SearchBar: React.FC<ISearchBar> = ({
     if (searchUserResults && user) {
       let filteredSearchResults = [] as any[];
       searchUserResults.forEach((result: any) => {
-        if (result.firebase_id !== user.firebase_id)
-          filteredSearchResults.push(result);
+        if (result.firebase_id !== user.firebase_id) {
+          let exist = selectedList.some((selected: any) => selected.firebase_id === result.firebase_id);
+          if (!exist)
+            filteredSearchResults.push(result);
+        }
       })
       setSearchResults(filteredSearchResults)
     }
@@ -89,10 +92,10 @@ export const SearchBar: React.FC<ISearchBar> = ({
 
       <div className="search-bar__input-block">
         <input
-          className={`search-bar__input ${editable !== null ? "search-bar__input--readonly" : ""}`}
+          className={`search-bar__input ${!editable ? "search-bar__input--readonly" : ""}`}
           placeholder="username to invite"
           value={searchQuery}
-          readOnly={editable !== null ? true : false}
+          readOnly={!editable ? true : false}
           onChange={(e: any) => {
             searchUser(e.target.value);
             setSearchQuery(e.target.value);

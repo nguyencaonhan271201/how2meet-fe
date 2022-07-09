@@ -68,3 +68,15 @@ interface ISearchBar {
   setSelected?: any,
   editable?: boolean
 }
+
+interface IMeetingMinuteCard {
+  meetingID?: number;
+  minuteID?: number;
+  creator?: ICreateUserResponse;
+  created?: string;
+  lastUpdated?: string;
+  title?: string;
+  description?: string;
+  isAddCard?: boolean;
+  addAction?: () => void;
+}
