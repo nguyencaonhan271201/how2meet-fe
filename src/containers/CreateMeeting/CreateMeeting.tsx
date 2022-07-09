@@ -17,6 +17,7 @@ import { doCreateMeeting, doGetUserByFirebaseID, resetMeetingCreationStatus, Roo
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { encrypt } from '../../helpers/password';
+import { validateURL } from '../../helpers/validate';
 
 export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
   document.title = "How2Meet? | New Meeting";
@@ -61,10 +62,6 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
   useEffect(() => {
     console.log(inputBlocks);
   }, [inputBlocks]);
-
-  useEffect(() => {
-    console.log(pollOptions);
-  }, [pollOptions]);
 
   useEffect(() => {
     generateCalendar();
@@ -172,7 +169,6 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
       }
     }
 
-    console.log(inputBlocks);
     setCurrentPage(currentPage + 1);
   }
 
@@ -240,6 +236,12 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
           if (errorText !== "")
             errorText += '<br>'
           errorText += `please input the description.`
+        }
+
+        if (link !== "" && !validateURL(link)) {
+          if (errorText !== "")
+            errorText += '<br>'
+          errorText += `the link is not valid.`
         }
 
         if (errorText === "") {
@@ -640,6 +642,8 @@ export const CreateMeeting: React.FC<ICreateMeeting> = ({ }) => {
         {/* Private mode */}
         {!isPublic && <SearchBar
           setSelected={setSelectedInvitators}
+          editable={true}
+          selected={selectedInvitators}
         ></SearchBar>}
 
         {/* Public mode */}

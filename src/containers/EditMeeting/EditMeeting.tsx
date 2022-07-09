@@ -21,6 +21,7 @@ import { useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import { decrypt } from '../../helpers/password';
 import { PollingChoiceSelectableCard } from '../../components/PollingChoiceSelectableCard/PollingChoiceSelectableCard';
+import { validateURL } from '../../helpers/validate';
 
 export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
   document.title = "How2Meet? | Edit Meeting";
@@ -331,6 +332,12 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
           if (errorText !== "")
             errorText += '<br>'
           errorText += `please input the description.`
+        }
+
+        if (link !== "" && !validateURL(link)) {
+          if (errorText !== "")
+            errorText += '<br>'
+          errorText += `the link is not valid.`
         }
 
         if (errorText === "") {
@@ -807,6 +814,9 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
       setCountSelected(countSelected + 1);
     }
 
+    pollOptionsClone.sort((optionA: any, optionB: any) => (
+      optionA.selectors.length <= optionB.selectors.length ? 1 : -1
+    ))
     setPollOptions(pollOptionsClone);
   }
 

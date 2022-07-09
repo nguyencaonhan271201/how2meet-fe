@@ -23,6 +23,7 @@ import { useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import { PollingChoiceSelectableCard } from '../../components/PollingChoiceSelectableCard/PollingChoiceSelectableCard';
 import { decrypt } from '../../helpers/password';
+import { validateURL } from '../../helpers/validate';
 
 export const MeetingPage: React.FC<ICreateMeeting> = ({ }) => {
   document.title = "How2Meet? | Meeting";
@@ -247,8 +248,6 @@ export const MeetingPage: React.FC<ICreateMeeting> = ({ }) => {
         return;
       }
     }
-
-    console.log(inputBlocks);
     setCurrentPage(currentPage + 1);
   }
 
@@ -316,6 +315,12 @@ export const MeetingPage: React.FC<ICreateMeeting> = ({ }) => {
           if (errorText !== "")
             errorText += '<br>'
           errorText += `please input the description.`
+        }
+
+        if (link !== "" && !validateURL(link)) {
+          if (errorText !== "")
+            errorText += '<br>'
+          errorText += `the link is not valid.`
         }
 
         if (errorText === "") {
@@ -793,6 +798,9 @@ export const MeetingPage: React.FC<ICreateMeeting> = ({ }) => {
       setCountSelected(countSelected + 1);
     }
 
+    pollOptionsClone.sort((optionA: any, optionB: any) => (
+      optionA.selectors.length <= optionB.selectors.length ? 1 : -1
+    ))
     setPollOptions(pollOptionsClone);
   }
 

@@ -51,7 +51,7 @@ export const getTimeText = (index: number) => {
 }
 
 export const getWeekNumber = (date: Date) => {
-  return moment(date).week();
+  return moment(date).isoWeek();
 }
 
 export const isMeetingAvailableForEdit = (start: string) => {

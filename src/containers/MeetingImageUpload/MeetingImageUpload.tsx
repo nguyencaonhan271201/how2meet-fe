@@ -112,8 +112,6 @@ export const MeetingImageUpload: React.FC<IMeetingImageUpload> = ({ }) => {
         showCompleteSwal();
       }
     }
-
-    console.log(deleteMeetingImageSuccess);
   }, [deleteMeetingImageSuccess]);
 
   useEffect(() => {
@@ -126,10 +124,6 @@ export const MeetingImageUpload: React.FC<IMeetingImageUpload> = ({ }) => {
       }
     }
   }, [createMeetingImageSuccess]);
-
-  useEffect(() => {
-    console.log(imagesList);
-  }, [imagesList]);
 
   //Helper functions
   const showCompleteSwal = () => {
