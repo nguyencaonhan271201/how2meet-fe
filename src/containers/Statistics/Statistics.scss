@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Lobster&display=swap');
+
+
+.statistics {
+  background: #F9FAFC;
+
+  &__container {
+    width: 80%;
+    margin: 0 auto;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Inter" !important;
+    font-weight: bold;
+  }
+  
+  a, p, td, th, ul, li, button, input, textarea, span, label {
+    font-family: "Inter" !important;
+  }
+  
+  &__options {
+    margin-top: 50px;
+    width: calc(100% - 24px);
+    display: inline-flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+
+  &__option {
+    margin-left: 10px;
+    padding: 5px 10px;
+    font-size: 18px;
+    border-radius: 8em;
+    width: 80px;
+    text-align: center;
+    cursor: pointer;
+
+    &:hover, &--selected {
+      background: #d1e8e4;
+    }
+  }
+
+  .MuiBox-root {
+    padding-top: 20px !important;
+  }
+}
+
+.card-change {
+  &__decrease {
+    margin-right: 2px;
+
+    path {
+      fill: red;
+    }
+  }
+
+  &__increase {
+    margin-right: 2px;
+
+    path {
+      fill: green;
+    }
+  }
+  
+  &__stable {
+    margin-right: 2px;
+
+    path {
+      fill: black;
+    }
+  }
+}

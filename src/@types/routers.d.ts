@@ -13,7 +13,6 @@ interface IPrivateRouter {
   component: any;
   layout: any;
   path: string;
-  exact?: boolean;
   header?: any;
   footer?: any;
   isHasFooter?: boolean;
