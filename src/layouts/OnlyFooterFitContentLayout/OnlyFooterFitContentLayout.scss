@@ -1,0 +1,16 @@
+.only-footer-fit-content {
+  min-height: calc(100vh + 60px);
+  position: relative;
+  
+  &__footer {
+   display: flex;
+  }
+  &__center {
+    display: flex;
+    height: fit-content;
+    min-height: 100vh;
+  }
+  &__container {
+    display: flex;
+  }
+}

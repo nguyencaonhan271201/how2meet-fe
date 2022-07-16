@@ -69,9 +69,9 @@ export const MeetingDashboard: React.FC<IMeetingDashboard> = ({ }) => {
 
       let endDate = new Date(meeting.date[1]);
       if (endDate) {
-        endDate.setHours(0);
-        endDate.setMinutes(0);
-        endDate.setSeconds(0);
+        endDate.setHours(23);
+        endDate.setMinutes(59);
+        endDate.setSeconds(59);
       }
 
       if (endDate > new Date(Date.now())) {

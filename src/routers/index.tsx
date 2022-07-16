@@ -24,6 +24,8 @@ import { EditMeeting } from '../containers/EditMeeting/EditMeeting';
 import { MeetingMinuteDashboard } from '../containers/MeetingMinuteDashboard/MeetingMinuteDashboard';
 import { FooterNoFixed } from '../components/FooterNoFixed/FooterNoFixed';
 import { OnlyFooter150Layout } from '../layouts/OnlyFooter150Layout/OnlyFooter150Layout';
+import { Statistics } from '../containers/Statistics/Statistics';
+import { OnlyFooterFitContentLayout } from '../layouts/OnlyFooterFitContentLayout/OnlyFooterFitContentLayout';
 
 export const Routers = () => {
   return (
@@ -113,6 +115,15 @@ export const Routers = () => {
           path={'/meeting-minute/:id/:minute_id'}
           component={MeetingMinute}
           layout={OnlyFooter150Layout}
+          footer={FooterNoFixed}
+          isHasFooter={true}
+        />
+
+        <PrivateRouter
+          exact={true}
+          path={'/meetings/statistics'}
+          component={Statistics}
+          layout={OnlyFooterFitContentLayout}
           footer={FooterNoFixed}
           isHasFooter={true}
         />
