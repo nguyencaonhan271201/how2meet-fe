@@ -681,7 +681,7 @@ export const Statistics: React.FC = () => {
                 <CardWithChange
                   label={`Total Meetings (this ${["Day", "Week", "Month", "Year"][currentOption]})`}
                   displayNumber={`${totalThisPeriod} ${totalThisPeriod === 1 ? "meeting" : "meetings"}`}
-                  change={isFinite(increasedThisPeriod) ? increasedThisPeriod : 0}
+                  change={isFinite(increasedThisPeriod) ? increasedThisPeriod : 100}
                   unit={`${["Day", "Week", "Month", "Year"][currentOption]}`}
                   iconColor={"teal"}
                 />
@@ -696,7 +696,7 @@ export const Statistics: React.FC = () => {
                 <CardWithChange
                   label={`Avg ${currentOption !== 2 ? "meeting" : ""} length (this ${["Day", "Week", "Month", "Year"][currentOption]})`}
                   displayNumber={`${averageMeetingLength} ${averageMeetingLength === 1 ? "day" : "days"}`}
-                  change={isFinite(increasedAverageMeetingLength) ? increasedAverageMeetingLength : 0}
+                  change={isFinite(increasedAverageMeetingLength) ? increasedAverageMeetingLength : 100}
                   unit={`${["Day", "Week", "Month", "Year"][currentOption]}`}
                   iconColor={"#ff8f00"}
                 />
@@ -711,7 +711,7 @@ export const Statistics: React.FC = () => {
                 <CardWithChange
                   label={`Avg # of people (this ${["Day", "Week", "Month", "Year"][currentOption]})`}
                   displayNumber={`${averageNumberOfParticipants} ${averageNumberOfParticipants === 1 ? "person" : "people"}`}
-                  change={isFinite(increasedAverageNumberOfParticipants) ? increasedAverageNumberOfParticipants : 0}
+                  change={isFinite(increasedAverageNumberOfParticipants) ? increasedAverageNumberOfParticipants : 100}
                   unit={`${["Day", "Week", "Month", "Year"][currentOption]}`}
                   iconColor={"#b71c1c"}
                 />
