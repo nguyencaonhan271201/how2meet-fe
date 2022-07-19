@@ -15,7 +15,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {
   doCreateMeeting, doGetMeetingByMeetingID, doGetUserByFirebaseID, doUpdateMeeting,
-  resetMeetingCreationStatus, RootState, updateMeetingPublic, useAppDispatch
+  resetMeetingCreationStatus, resetMeetingUpdateStatus, RootState, updateMeetingPublic, useAppDispatch
 } from '../../redux';
 import { useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
@@ -114,14 +114,14 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
   }, []);
 
   useEffect(() => {
-    if (((localStorage.getItem('firebase_id') && user) || !localStorage.getItem('firebase_id'))
+    if (currentPage === 0 && ((localStorage.getItem('firebase_id') && user) || !localStorage.getItem('firebase_id'))
       && meetingInfo && Object.keys(meetingInfo).length !== 0) {
       checkForAccessRights();
     }
   }, [meetingInfo, user])
 
   useEffect(() => {
-    if (((localStorage.getItem('firebase_id') && user) || !localStorage.getItem('firebase_id'))
+    if (currentPage === 0 && ((localStorage.getItem('firebase_id') && user) || !localStorage.getItem('firebase_id'))
       && meetingInfo && Object.keys(meetingInfo).length !== 0) {
       checkForAccessRights();
     }
@@ -137,7 +137,7 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
         text: 'Your choice is saved successfully!',
       })
         .then(() => {
-          dispatch(resetMeetingCreationStatus());
+          dispatch(resetMeetingUpdateStatus());
           history.push("/meetings")
           return;
         })
@@ -743,6 +743,7 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
         blocks: getBlocks,
       })
     }
+
     setInputBlocks(modifiedInputBlocks);
 
     setPollOptions(meetingInfo?.poll);

@@ -439,5 +439,5 @@ const slice = createSlice({
 
 const { reducer, actions } = slice;
 export const { resetMeetingCreationStatus, temporarilySavedUserToAdd, updateMeetingPublic,
-  resetMeetingImageStatus, resetMeetingMinuteStatus } = actions;
+  resetMeetingImageStatus, resetMeetingMinuteStatus, resetMeetingUpdateStatus } = actions;
 export default reducer;
