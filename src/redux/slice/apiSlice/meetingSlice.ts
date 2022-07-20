@@ -83,6 +83,12 @@ export const doDeleteMinute
   return result.data;
 });
 
+export const doRemindParticipants 
+= createAsyncThunk('apiMeeting@post/remindParticipants', async () => {
+  const result: AxiosResponse = await apiMeeting.remindParticipants();
+  return result.data;
+});
+
 const initialState = {
   isCreatingNewMeeting: false,
   createNewMeetingSuccess: false,
@@ -433,6 +439,13 @@ const slice = createSlice({
       state.deleteMeetingMinuteError = {
         error: "Error occured"
       }
+    });
+
+    builder.addCase(doRemindParticipants.pending, (state) => {
+    });
+    builder.addCase(doRemindParticipants.fulfilled, (state, action) => {
+    });
+    builder.addCase(doRemindParticipants.rejected, (state, action) => {
     });
   },
 });

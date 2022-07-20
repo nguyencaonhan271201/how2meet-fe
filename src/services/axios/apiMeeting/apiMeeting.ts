@@ -71,4 +71,9 @@ export const apiMeeting = {
     const url = `/meetingminutes/${param.minute_id}`;
     return axiosTest.delete(url);
   },
+
+  remindParticipants: () => {
+    const url = `/meeting/reminders`;
+    return axiosTest.post(url);
+  }
 };
