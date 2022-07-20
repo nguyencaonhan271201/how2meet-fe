@@ -26,6 +26,7 @@ import { FooterNoFixed } from '../components/FooterNoFixed/FooterNoFixed';
 import { OnlyFooter150Layout } from '../layouts/OnlyFooter150Layout/OnlyFooter150Layout';
 import { Statistics } from '../containers/Statistics/Statistics';
 import { OnlyFooterFitContentLayout } from '../layouts/OnlyFooterFitContentLayout/OnlyFooterFitContentLayout';
+import { Cronjobs } from '../containers/Cronjobs/Cronjobs';
 
 export const Routers = () => {
   return (
@@ -127,6 +128,15 @@ export const Routers = () => {
           footer={FooterNoFixed}
           isHasFooter={true}
         />
+
+        <PublicRouter
+          exact={true}
+          path={'/cronjobs'}
+          component={Cronjobs}
+          layout={OnlyFooterLayout}
+          isHasFooter={false}
+        />
+
 
       </Switch>
     </Router>
