@@ -1,7 +1,7 @@
 import './RegisterPage.scss';
 import { Input } from '../../components/Input/Input'
 import LogoGoogle from '../../assets/images/google_logo.svg';
-import LogoHow2Meet from '../../assets/images/logo.svg';
+import LogoHow2Meet from '../../assets/images/logo-auth-dark.svg';
 
 import React, { useEffect, useState } from 'react';
 import { signInWithGoogle, logInWithEmailAndPassword, registerWithEmailAndPassword, logout, onAuthStateChanged, auth, googleProvider } from '../../configs/firebase';
@@ -221,7 +221,7 @@ export const RegisterPage: React.FC<ILoginPage> = ({ }) => {
 
         <div className="register-page__form col-md-6 col-sm-0">
           <div className="register-page__top-form">
-            <h2 className="register-page__form__title">sign in</h2>
+            <h2 className="register-page__form__title">sign up</h2>
             <p className="register-page__form__light">already have an account?
               {" "}
               <a href="#" onClick={(e) => {

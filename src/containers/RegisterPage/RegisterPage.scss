@@ -7,10 +7,11 @@
 
   &__image {
     padding: 0px 0rem;
+    background: black;
 
     &__logo {
       margin: 0 auto;
-      max-width: 90%;
+      max-width: 80%;
       height: auto;
     }
   }
@@ -22,7 +23,7 @@
 
     &__title {
       text-transform: lowercase !important;
-      color: var(--theme-green);
+      color: black;
     }
 
     &__light {

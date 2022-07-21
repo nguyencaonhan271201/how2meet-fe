@@ -32,7 +32,11 @@ export const Routers = () => {
   return (
     <Router>
       <Switch>
-        <PublicRouter exact={true} path={'/'} component={LandingPage} layout={FullLayout} />
+        <PublicRouter
+          exact={true}
+          path={'/'}
+          component={LandingPage}
+          layout={OnlyFooterLayout} />
 
         <PublicRouter
           exact={true}
