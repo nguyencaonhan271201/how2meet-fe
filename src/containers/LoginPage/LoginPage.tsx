@@ -1,7 +1,7 @@
 import './LoginPage.scss';
 import { Input } from '../../components/Input/Input'
 import LogoGoogle from '../../assets/images/google_logo.svg';
-import LogoHow2Meet from '../../assets/images/logo.svg';
+import LogoHow2Meet from '../../assets/images/logo-auth.svg';
 
 import React, { useEffect, useState } from 'react';
 import { signInWithGoogle, logInWithEmailAndPassword, registerWithEmailAndPassword, logout, onAuthStateChanged, auth, googleProvider } from '../../configs/firebase';

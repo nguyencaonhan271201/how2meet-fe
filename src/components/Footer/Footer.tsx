@@ -81,7 +81,7 @@ export const Footer: React.FC<IFooter> = ({ }) => {
           <li onClick={() => { history.push("/meetings/statistics") }}>Statistics</li>
           <li onClick={() => { history.push("/new-meeting") }}>New meeting</li>
           <li onClick={() => { history.push("/edit-account") }}>Edit account</li>
-          <li onClick={() => { logout(); history.push("/auth"); }}>Log out</li>
+          <li onClick={() => { logout(); history.push("/"); }}>Log out</li>
         </ul>
       </div>
     </div >

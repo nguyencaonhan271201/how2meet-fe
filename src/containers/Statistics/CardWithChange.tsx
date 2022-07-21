@@ -59,7 +59,7 @@ export const CardWithChange = (props) => (
           }}
           variant="body2"
         >
-          {props.change}%
+          {Math.abs(props.change)}%
         </Typography>
         <Typography
           color="textSecondary"
