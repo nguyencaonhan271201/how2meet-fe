@@ -66,7 +66,7 @@ export const LandingPage: React.FC<ILandingPage> = ({ }) => {
       <div className="landing-page__overlay"></div>
 
       <div className="landing-page__container">
-        <p className="landing-page__title">The solution you need to have a perfect meeting.</p>
+        <p className="landing-page__title">The solution you need for a perfect meeting or bonding.</p>
         <span className="landing-page__subtitle-block">
           <span style={{ opacity: 0 }}>a</span>
           <span className="landing-page__subtitle">{currentDisplaySubtitle}</span>
