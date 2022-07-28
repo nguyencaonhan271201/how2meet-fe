@@ -1,5 +1,6 @@
 .footer-no-fixed {
-  position: relative;
+  bottom: 5px;
+  left: 0;
   height: 60px;
   padding: 10px;
   display: inline-flex;
@@ -16,10 +17,9 @@
   &__menu {
     width: fit-content;
     position: absolute;
-    bottom: 10px;
-    left: 55px;
-    background: #999999;
-    border-radius: 27px;
+    bottom: 0px;
+    left: 0px;
+    background: none;
     overflow: hidden;
     display: none;
     transition: display 300ms;
@@ -33,21 +33,52 @@
       margin-bottom: 0;
       list-style: none;
       padding: 0;
+      position: relative;
+      height: 300px;
+      width: 200px;
 
       li {
         text-decoration: none;
         text-align: center;
         padding: 5px;
-        color: white;
+        color: #616161;
         cursor: pointer;
+        border-radius: 50%;
+        padding: 3.5px;
+        width: 30px;
+        height: 30px;
+        border: 1px solid #616161;
+        position: absolute;
 
         &:hover {
           background: #616161;
+          color: white;
         }
-      }
 
-      li:not(:last-child) {
-        border-bottom: 2px solid white; 
+        &:nth-child(1) {
+          left: 10px;
+          bottom: 195px;
+        }
+
+        &:nth-child(2) {
+          left: 10px;
+          bottom: 160px;
+        }
+
+        &:nth-child(3) {
+          left: 10px;
+          bottom: 125px;
+        }
+
+        &:nth-child(4) {
+          left: 10px;
+          bottom: 90px;
+        }
+
+        &:nth-child(5) {
+          left: 10px;
+          bottom: 55px;
+        }
       }
     }
   }
