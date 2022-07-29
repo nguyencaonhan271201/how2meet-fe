@@ -85,7 +85,7 @@ export const MeetingPage: React.FC<ICreateMeeting> = ({ }) => {
 
   //Hooks
   useEffect(() => {
-    console.log(inputBlocks);
+    //console.log(inputBlocks);
   }, [inputBlocks]);
 
   useEffect(() => {
@@ -743,6 +743,7 @@ export const MeetingPage: React.FC<ICreateMeeting> = ({ }) => {
     })
     setCountSelected(selected);
     setSelectedInvitators(meetingInfo?.invitators);
+    setIsPublic(meetingInfo?.isPublic);
 
     setUpdate(update + 1);
   }

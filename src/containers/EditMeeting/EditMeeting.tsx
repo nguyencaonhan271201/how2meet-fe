@@ -1189,7 +1189,7 @@ export const EditMeeting: React.FC<ICreateMeeting> = ({ }) => {
                 textDecorationColor: "underline"
               }}
               onClick={() => {
-                navigator.clipboard.writeText(`${meetingPassword}`);
+                navigator.clipboard.writeText(`${decrypt(meetingPassword)}`);
                 toast("Copied to clipboard", {
                   position: "top-right",
                   autoClose: 1000,
