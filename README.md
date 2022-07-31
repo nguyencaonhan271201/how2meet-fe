@@ -53,7 +53,7 @@ Users will also be notified via email for the two cases:
 - In the morning of the start date of participated meetings
   ![Email 2](https://firebasestorage.googleapis.com/v0/b/how2meetntt.appspot.com/o/readme%2F1.jpg?alt=media&token=435ae5de-1a54-4d3c-889c-65bac0c0911c)
 
-**All in one - with <a href="https://how2meetbyntt.web.app/" target="_blank">How2Meet?</a>**
+**All in one - with <a href="https://how2meetntt.web.app/" target="_blank">How2Meet?</a>**
 
 <img src="https://firebasestorage.googleapis.com/v0/b/how2meetntt.appspot.com/o/readme%2Flogo.png?alt=media&token=199eb04a-2519-4ff8-b44f-b2e52abe895b" alt=""
 style="width: 100px"></img>
